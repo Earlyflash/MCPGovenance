@@ -6,7 +6,7 @@ schema, and a **governor** collates everything into a single PR comment and a si
 
 The demo consumer is [MCPGovenance-DemoApp](https://github.com/Earlyflash/MCPGovenance-DemoApp).
 
-For the reasoning, the step-by-step flow and the properties to protect, read [docs/how-it-works.md](docs/how-it-works.md).
+For the reasoning, the step-by-step flow and the properties to protect, read [docs/how-it-works.md](docs/how-it-works.md). To add rules, change policy or add a new area, read [docs/extending.md](docs/extending.md).
 
 ```
  pull request
