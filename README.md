@@ -8,6 +8,8 @@ The demo consumer is [MCPGovenance-DemoApp](https://github.com/Earlyflash/MCPGov
 
 For the reasoning, the step-by-step flow and the properties to protect, read [docs/how-it-works.md](docs/how-it-works.md). To add rules, change policy or add a new area, read [docs/extending.md](docs/extending.md).
 
+**Where it could go:** [docs/roadmap.md](docs/roadmap.md) (ideas, not commitments).
+
 **Guardrails by product stage** (scan → pilot → production, with the stage matrix): [docs/guardrails.md](docs/guardrails.md).
 
 **Human-readable policy:** [docs/policy/](docs/policy/) (what people read; each finding links to its section).
