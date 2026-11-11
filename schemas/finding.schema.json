@@ -18,6 +18,8 @@
     "file": { "type": ["string", "null"] },
     "line": { "type": ["integer", "null"], "minimum": 1 },
     "evidence": { "type": "string", "description": "What was found. Secrets are redacted." },
+    "applies_from": { "type": "string", "enum": ["scan", "pilot", "production"], "description": "Product stage this guardrail starts to apply in." },
+    "severity_by_stage": { "type": ["object", "null"], "description": "Severity of the guardrail at each product stage; null before it applies." },
     "policy_url": { "type": "string", "description": "Link to the human-readable policy for this rule." },
     "guidance_url": { "type": "string", "description": "Link to this rule in the domain's guidance." },
     "guidance_version": { "type": "string", "description": "Version of the domain knowledge the finding was explained from." },

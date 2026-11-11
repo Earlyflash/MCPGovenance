@@ -8,6 +8,8 @@ The demo consumer is [MCPGovenance-DemoApp](https://github.com/Earlyflash/MCPGov
 
 For the reasoning, the step-by-step flow and the properties to protect, read [docs/how-it-works.md](docs/how-it-works.md). To add rules, change policy or add a new area, read [docs/extending.md](docs/extending.md).
 
+**Guardrails by product stage** (scan → pilot → production, with the stage matrix): [docs/guardrails.md](docs/guardrails.md).
+
 **Human-readable policy:** [docs/policy/](docs/policy/) (what people read; each finding links to its section).
 
 **Guides by audience:** [for governance teams](docs/for-governance-teams.md) (writing policy, approving changes and waivers) and [for developers](docs/for-developers.md) (reading the comment, fixing findings, asking for a waiver).
@@ -72,6 +74,7 @@ All checks are deterministic. The catalogue and the rule text are **example cont
 
 ## Behaviours worth knowing
 
+- **Product stages.** A repo declares `stage: scan|pilot|production` in `.governance.yml`; each rule has `applies_from`. Later-stage findings are previewed, not counted. Raising the stage re-checks the whole repo. Undeclared means production. See [docs/guardrails.md](docs/guardrails.md).
 - **Diff mode.** A PR is only judged on what it changed. Dependencies are compared against the base commit, because adding one JSON entry also edits the line above it. A scheduled full scan (`full-scan: true`) judges everything.
 - **Fails closed.** If a required reviewer crashes or never reports, the governor fails the check (`GOV-001`/`GOV-002`) instead of passing silently. Optional domains only warn.
 - **Waivers.** `.governance-waivers.yml` in the PR's repo: `rule_id`, optional `path`, `reason`, `approver`, `expires` (max 90 days). Waived findings stay visible in the comment. `SEC-001` can never be waived. Set `waivers.require_approval: true` in `policy.yml` once a second reviewer exists: the named approver must then have approved the PR.
@@ -108,7 +111,7 @@ The repository is public, so no sharing settings are needed. If you make it priv
 ```bash
 python -m venv .venv && . .venv/bin/activate
 pip install -r requirements-dev.txt
-python -m pytest                                        # 68 tests, including real MCP sessions and git runs
+python -m pytest                                        # ~90 tests, including real MCP sessions and git runs
 
 # Judge a branch in any git repo, exactly as CI would:
 python -m governance local --repo /path/to/repo --base main --head HEAD

@@ -20,6 +20,7 @@ Rules live in `domains/<id>/knowledge/rules.yml`.
 - id: SEC-007                 # <PREFIX>-<number>, never reuse an id
   title: Unpinned container image
   severity: warn              # block | warn | info
+  applies_from: pilot         # scan | pilot | production: the product stage this guardrail starts to apply in
   confidence: high            # high | medium | low
   tags: [docker, supply-chain]
   summary: One sentence on what is wrong and why it matters.
@@ -59,6 +60,16 @@ Rules of thumb:
 - If a hit uses a rule id missing from `rules.yml`, the run fails with "code and knowledge have drifted". That is
   intentional: it stops code and guidance disagreeing.
 
+**Escalating by stage:** to make a rule a warning early and a block later, set the early severity and add
+`escalate: { production: block }`. Severity may only rise, and only at stages after `applies_from`. Use it to
+nudge early-stage products without blocking them, while holding production to the full standard.
+
+**Choosing `applies_from`:** a rule applies at its stage and every later one, so pick the *earliest* stage at
+which it is reasonable to demand it. `scan` is for the must-never-happen rules (leaked secrets, banned
+technology), `pilot` for everyday good practice, `production` for what a system people rely on must meet. It
+defaults to `scan` if left out, which is the strictest choice. After changing stages run
+`python -m governance docs` to refresh the generated guardrail pages (a test fails if you forget).
+
 **Retiring a rule:** remove the detector first, then the rule. Never recycle an id, because old waivers refer to it.
 
 ### Enterprise alignment is mostly data
@@ -92,6 +103,7 @@ CI and Copilot are told. Ideally this file is generated from your real technolog
 | `enforcement.mode` | `policy.yml` | `warn-only` reports "would be blocked" without failing (use for onboarding). |
 | `waivers.max_days`, `require_approval`, `never_waivable` | `policy.yml` | How exceptions work. Add ids to `never_waivable` for rules that must always be fixed. |
 | `ignore_paths` | `policy.yml` | Files no reviewer sees. |
+| `stages.default`, `stages.file` | `policy.yml` | Stage assumed when a product declares none (strictest by default), and the file it declares it in. |
 
 Ownership matters: `domain.yml` and `knowledge/` belong to the domain team; `policy.yml` belongs to the platform
 or OCTO. Use CODEOWNERS on this repo so each team approves only its own area.
@@ -166,6 +178,7 @@ When a team wants to own and release its domain independently:
 
 ## Checklist before merging any change here
 
+- [ ] `applies_from` chosen deliberately and `python -m governance docs` run
 - [ ] Rule id is new (or deliberately kept), and exists in both `rules.yml` and the detector
 - [ ] Severity matches the domain's mode and confidence
 - [ ] Tests cover a violation, a clean case and one false-positive guard

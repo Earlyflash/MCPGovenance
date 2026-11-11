@@ -40,6 +40,31 @@ What good looks like  ▸ (expand for an example)
 
 Only the lines **your PR added or changed** are judged. Old code is not held against you.
 
+### Your product's stage
+
+Not every product has to meet every guardrail on day one. Your repo declares how mature it is, and you get more
+guardrails as it grows:
+
+🔍 Scan → 🧪 Pilot → 🚀 Production. See [guardrails by stage](guardrails.md) for exactly what applies at each.
+
+Declare it in `.governance.yml` at the root of your repo:
+
+```yaml
+stage: pilot     # scan | pilot | production
+```
+
+(or put `<!-- governance-stage: pilot -->` in your README). The comment shows your stage at the top.
+
+- A guardrail applies from its stage onward, so moving up only ever adds guardrails.
+- Some guardrails also get **stricter**: a warning at pilot can block in production. The comment says so (*Heads up: at Production it becomes blocking*), so you can fix it early rather than at the last minute.
+- **Not declared means production**, the strictest stage.
+- Findings from a guardrail that starts at a later stage appear under **Coming at a higher stage**. They are real
+  problems in your change, but they do not count today. It is a free look at what promotion will demand.
+- **Moving up a stage** is a pull request that changes `stage:`. The whole repository is then checked against the
+  new guardrails, not just your diff, so you find out whether you are ready. Fix what it finds in the same PR or
+  before.
+- You cannot lower the stage in a pull request to dodge a finding. The stage already on the main branch applies.
+
 ### Which areas run
 
 Only the areas relevant to your change run. A docs-only change gets security only. Touching `package.json`,
@@ -118,7 +143,7 @@ job summary still work. Otherwise open the check's details, or the **workflow ru
 run counts as blocking, so a broken check never looks like a pass. Re-run the workflow. If it persists, tell the
 platform team.
 
-**Will old problems in files I touch be flagged?** Only lines you added or changed. A scheduled full scan covers
+**Will old problems in files I touch be flagged?** Only lines you added or changed, unless the PR raises the product's stage, which checks everything. A scheduled full scan covers
 the rest of the repo.
 
 **Can I run it before pushing?** Yes. From a clone of the governance repo:

@@ -47,7 +47,7 @@ def test_gate_blocks_and_advise_never_does(tmp_path):
     by = {f["domain"]: f for f in v["findings"]}
     assert by["security"]["effective_severity"] == "block"
     assert by["accessibility"]["effective_severity"] == "warn" and by["accessibility"]["capped"]
-    assert v["verdict"] == "fail" and v["counts"] == {"block": 1, "warn": 1, "info": 0, "waived": 0}
+    assert v["verdict"] == "fail" and v["counts"] == {"block": 1, "warn": 1, "info": 0, "waived": 0, "deferred": 0}
 
 
 def test_advise_only_gives_warnings(tmp_path):

@@ -3,6 +3,7 @@
 # governor caps every block at warn. Flip `mode` in domain.yml to gate and the same rules block.
 rules:
   - id: A11Y-001
+    applies_from: pilot
     title: Image without alternative text
     severity: block
     confidence: high
@@ -19,6 +20,7 @@ rules:
         <img src="chart.png" alt="Quarterly sign-ups rose from 120 to 340">
 
   - id: A11Y-002
+    applies_from: scan
     title: Page language not set
     severity: block
     confidence: high
@@ -33,6 +35,7 @@ rules:
         <html lang="en-GB">
 
   - id: A11Y-003
+    applies_from: pilot
     title: Form control without a label
     severity: block
     confidence: medium
@@ -50,6 +53,7 @@ rules:
         <input id="email" type="email" name="email" autocomplete="email">
 
   - id: A11Y-004
+    applies_from: production
     title: Link text does not describe its destination
     severity: warn
     confidence: medium
@@ -64,6 +68,7 @@ rules:
         <a href="/pricing">See pricing plans</a>
 
   - id: A11Y-005
+    applies_from: scan
     title: Page has no title
     severity: warn
     confidence: high
@@ -78,6 +83,7 @@ rules:
         <head><title>Pricing plans - Example</title></head>
 
   - id: A11Y-006
+    applies_from: pilot
     title: Button without an accessible name
     severity: block
     confidence: medium

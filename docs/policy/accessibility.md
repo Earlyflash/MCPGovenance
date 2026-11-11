@@ -1,14 +1,30 @@
 # Accessibility policy
 
-> **PoC example.** In a real deployment this page is the human-written policy, owned by the Accessibility Practice and published on the documentation site. Each section below is one rule. The machine-readable form used by the pipeline is [`rules.yml`](../../domains/accessibility/knowledge/rules.yml); keep the two in step when either changes.
+> **PoC example.** In a real deployment this page is the human-written policy, owned by the domain team and published on the documentation site. This copy is generated from [`rules.yml`](../../domains/accessibility/knowledge/rules.yml) by `python -m governance docs`, so the stage tables always match what the pipeline enforces.
 
 **Owner:** Accessibility Practice (PoC placeholder) · **Contact:** #accessibility (placeholder) · **Enforcement:** advice only; nothing here blocks a merge.
 
 **Exceptions:** Advise-only domain: findings never block a merge. If you disagree with one, reply on the pull request and tag the accessibility practice. Persistent disagreements are reviewed monthly and may change the guidance.
 
+## Which guardrails apply to your product
+
+A product declares its stage (see [guardrails by stage](../guardrails.md)). A guardrail applies from the stage shown and to every later stage, so a production product has all of them.
+
+| Rule | 🔍 Scan | 🧪 Pilot | 🚀 Production |
+| --- | :---: | :---: | :---: |
+| [A11Y-001 Image without alternative text](#a11y-001-image-without-alternative-text) | ▫️ | ⚠️ | ⚠️ |
+| [A11Y-002 Page language not set](#a11y-002-page-language-not-set) | ⚠️ | ⚠️ | ⚠️ |
+| [A11Y-003 Form control without a label](#a11y-003-form-control-without-a-label) | ▫️ | ⚠️ | ⚠️ |
+| [A11Y-004 Link text does not describe its destination](#a11y-004-link-text-does-not-describe-its-destination) | ▫️ | ▫️ | ⚠️ |
+| [A11Y-005 Page has no title](#a11y-005-page-has-no-title) | ⚠️ | ⚠️ | ⚠️ |
+| [A11Y-006 Button without an accessible name](#a11y-006-button-without-an-accessible-name) | ▫️ | ⚠️ | ⚠️ |
+
+⛔ blocks the merge · ⚠️ warning · ℹ️ note · ▫️ does not apply yet
+
 ## A11Y-001 Image without alternative text
 
-**Effect:** Blocks the merge
+**Applies from:** 🧪 Pilot  
+**By stage:** 🔍 Scan: ▫️ not yet → 🧪 Pilot: ⚠️ warning → 🚀 Production: ⚠️ warning
 
 An image has no alt attribute, so screen reader users get nothing (or the file name) in its place.
 
@@ -30,7 +46,8 @@ Prefer:
 
 ## A11Y-002 Page language not set
 
-**Effect:** Blocks the merge
+**Applies from:** 🔍 Scan  
+**By stage:** 🔍 Scan: ⚠️ warning → 🧪 Pilot: ⚠️ warning → 🚀 Production: ⚠️ warning
 
 Without a lang attribute on the html element screen readers may pronounce the page in the wrong language.
 
@@ -52,7 +69,8 @@ Prefer:
 
 ## A11Y-003 Form control without a label
 
-**Effect:** Blocks the merge
+**Applies from:** 🧪 Pilot  
+**By stage:** 🔍 Scan: ▫️ not yet → 🧪 Pilot: ⚠️ warning → 🚀 Production: ⚠️ warning
 
 An input, select or textarea has no programmatic label, so assistive technology cannot tell users what to enter.
 
@@ -75,7 +93,8 @@ Prefer:
 
 ## A11Y-004 Link text does not describe its destination
 
-**Effect:** Warning
+**Applies from:** 🚀 Production  
+**By stage:** 🔍 Scan: ▫️ not yet → 🧪 Pilot: ▫️ not yet → 🚀 Production: ⚠️ warning
 
 Link text such as "click here" or "read more" is meaningless when links are read out of context.
 
@@ -97,7 +116,8 @@ Prefer:
 
 ## A11Y-005 Page has no title
 
-**Effect:** Warning
+**Applies from:** 🔍 Scan  
+**By stage:** 🔍 Scan: ⚠️ warning → 🧪 Pilot: ⚠️ warning → 🚀 Production: ⚠️ warning
 
 A page without a title gives screen reader users and tab bars nothing to identify it by.
 
@@ -119,7 +139,8 @@ Prefer:
 
 ## A11Y-006 Button without an accessible name
 
-**Effect:** Blocks the merge
+**Applies from:** 🧪 Pilot  
+**By stage:** 🔍 Scan: ▫️ not yet → 🧪 Pilot: ⚠️ warning → 🚀 Production: ⚠️ warning
 
 A button with no text and no aria-label is announced as just "button".
 
@@ -138,3 +159,4 @@ Prefer:
 ```
 <button aria-label="Close dialog"><svg aria-hidden="true">...</svg></button>
 ```
+

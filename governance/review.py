@@ -11,6 +11,7 @@ import traceback
 from pathlib import Path
 from typing import Any
 
+from .stages import applies, severity_at
 from .findings import DomainResult, Finding, effective_severity
 from .mcp_client import open_domain
 from .reviewers.base import Context
@@ -26,8 +27,8 @@ def _escape(value: str, prop: bool = False) -> str:
     return value
 
 
-def annotate(finding: Finding, mode: str) -> str:
-    level = ANNOTATION_LEVEL[effective_severity(finding.severity, mode)]
+def annotate(finding: Finding, mode: str, stage: str = "production") -> str:
+    level = ANNOTATION_LEVEL[effective_severity(severity_at(finding.severity_by_stage, finding.severity, stage), mode)]
     props = f"title={_escape(f'{finding.domain} {finding.rule_id}: {finding.title}', True)}"
     if finding.file:
         props = f"file={_escape(finding.file, True)}," + (f"line={finding.line}," if finding.line else "") + props
@@ -74,6 +75,8 @@ async def review_domain(domain_id: str, root: Path, repo: Path, triage_data: dic
                     guidance_version=info["guidance_version"],
                     guidance_url=g.get("guidance_url", ""),
                     policy_url=g.get("policy_url", ""),
+                    applies_from=g.get("applies_from", "scan"),
+                    severity_by_stage=g.get("severity_by_stage"),
                     remediation=g["remediation"],
                     owner=info["owner"],
                     waiver_route=route["waiver_route"],
@@ -102,6 +105,8 @@ async def review_domain(domain_id: str, root: Path, repo: Path, triage_data: dic
 def run_and_write(domain_id: str, root: Path, repo: Path, triage_path: Path, out_dir: Path, full: bool = False, annotate_output: bool = False) -> DomainResult:
     out_dir.mkdir(parents=True, exist_ok=True)
     triage_data = json.loads(triage_path.read_text(encoding="utf-8"))
+    full = full or bool(triage_data.get("full_scan"))
+    stage = (triage_data.get("stage") or {}).get("stage") or "production"
     try:
         result = asyncio.run(review_domain(domain_id, root, repo, triage_data, full))
     except Exception as exc:  # fail closed: the governor reads status=error and decides per policy
@@ -111,5 +116,6 @@ def run_and_write(domain_id: str, root: Path, repo: Path, triage_path: Path, out
     (out_dir / f"findings-{domain_id}.json").write_text(json.dumps(result.to_dict(), indent=2), encoding="utf-8")
     if annotate_output or os.environ.get("GITHUB_ACTIONS") == "true":
         for f in result.findings:
-            print(annotate(Finding(**f), result.mode))
+            if applies(f.get("applies_from", "scan"), stage):  # guardrails for a later stage do not annotate the diff
+                print(annotate(Finding(**f), result.mode, stage))
     return result

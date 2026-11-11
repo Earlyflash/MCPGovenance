@@ -33,7 +33,7 @@ def _labels(raw: str | None) -> list[str]:
 
 def cmd_triage(a: argparse.Namespace) -> int:
     policy = load_policy(a.policy)
-    data = triage(Path(a.repo), policy, a.base, a.head, _labels(a.labels), a.full_scan)
+    data = triage(Path(a.repo), policy, a.base, a.head, _labels(a.labels), a.full_scan, a.stage or None)
     out = Path(a.out)
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(data, indent=2), encoding="utf-8")
@@ -95,7 +95,8 @@ def cmd_local(a: argparse.Namespace) -> int:
     out.mkdir(parents=True, exist_ok=True)
     repo = Path(a.repo).resolve()
     policy = load_policy(a.policy)
-    data = triage(repo, policy, a.base, a.head, _labels(a.labels), a.full_scan)
+    data = triage(repo, policy, a.base, a.head, _labels(a.labels), a.full_scan, a.stage or None)
+    a.full_scan = a.full_scan or data["full_scan"]
     triage_path = out / "triage.json"
     triage_path.write_text(json.dumps(data, indent=2), encoding="utf-8")
     for d in data["domains"]:
@@ -103,6 +104,18 @@ def cmd_local(a: argparse.Namespace) -> int:
     verdict = _govern(a.policy, triage_path, out, repo, out, False, None, None)
     print((out / "comment.md").read_text(encoding="utf-8"))
     return 1 if verdict["verdict"] == "fail" else 0
+
+
+def cmd_docs(a: argparse.Namespace) -> int:
+    from . import docs_gen
+    if a.check:
+        bad = docs_gen.stale(ROOT)
+        for p in bad:
+            print(f"out of date: {p.relative_to(ROOT)} (run: python -m governance docs)")
+        return 1 if bad else 0
+    for p in docs_gen.write(ROOT):
+        print(f"wrote {p.relative_to(ROOT)}")
+    return 0
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -116,6 +129,7 @@ def main(argv: list[str] | None = None) -> int:
     t.add_argument("--head")
     t.add_argument("--labels", default="")
     t.add_argument("--full-scan", action="store_true")
+    t.add_argument("--stage", default=os.environ.get("GOV_STAGE", ""), help="stage from a trusted setting: scan, pilot or production")
     t.add_argument("--policy", default=default_policy)
     t.add_argument("--out", default=".governance-out/triage.json")
     t.set_defaults(fn=cmd_triage)
@@ -145,9 +159,14 @@ def main(argv: list[str] | None = None) -> int:
     l.add_argument("--head", default="HEAD")
     l.add_argument("--labels", default="")
     l.add_argument("--full-scan", action="store_true")
+    l.add_argument("--stage", default="", help="stage from a trusted setting: scan, pilot or production")
     l.add_argument("--policy", default=default_policy)
     l.add_argument("--out", default=".governance-out")
     l.set_defaults(fn=cmd_local)
+
+    d = sub.add_parser("docs", help="regenerate the guardrail documentation from the rules")
+    d.add_argument("--check", action="store_true", help="fail if the generated pages are out of date")
+    d.set_defaults(fn=cmd_docs)
 
     a = p.parse_args(argv)
     return a.fn(a)

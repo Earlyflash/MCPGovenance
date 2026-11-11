@@ -29,6 +29,13 @@ domains:
     paths: ["*.html", "*.htm"]
     labels: ["a11y-review"]
 
+# A product declares its stage (scan -> pilot -> production) in .governance.yml, a README marker or the workflow
+# input. Each guardrail says which stage it starts to apply in (applies_from in its rules.yml) and applies from
+# there onward. A product that has not declared a stage is held to the default, which is the strictest.
+stages:
+  default: production
+  file: .governance.yml
+
 waivers:
   file: .governance-waivers.yml
   max_days: 90

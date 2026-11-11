@@ -27,8 +27,8 @@ explains how your policy becomes something every pull request is checked against
 
 | You own | Where | Changes by |
 | --- | --- | --- |
-| The human-readable policy | `docs/policy/<area>.md` (or the docs site) | Pull request |
-| Rule wording, fix advice, examples, severity | `domains/<area>/knowledge/rules.yml` | Pull request |
+| The human-readable policy | `docs/policy/<area>.md` (generated here; on the docs site in real use) | Pull request |
+| Rule wording, fix advice, examples, severity, and the stage it starts at | `domains/<area>/knowledge/rules.yml` | Pull request |
 | How strict the area is (`gate`, `advise`, `evidence`), owner, contact, how to ask for a waiver | `domains/<area>/domain.yml` | Pull request |
 | Checks that find violations | `governance/reviewers/<area>.py` | Pull request |
 | Technology decisions (enterprise alignment) | `domains/enterprise-alignment/knowledge/technology.yml` | Pull request |
@@ -61,6 +61,47 @@ fixing the problem.
 
 You can write the YAML yourself, or give the policy to an engineer or an AI assistant to draft it. Either way the
 draft is reviewed in the pull request, which is where your approval happens.
+
+## Choosing the stage a guardrail starts at
+
+Products are not all equally mature, so guardrails are staged. Every rule has an `applies_from` stage, and it
+applies there and at every later stage:
+
+| Stage | Meaning | Typical guardrails |
+| --- | --- | --- |
+| 🔍 Scan | Exploring an idea | Only what must never happen: leaked secrets, banned technology |
+| 🧪 Pilot | Real users, limited scope | Everyday good practice |
+| 🚀 Production | Relied upon | Everything, including the heavier requirements |
+
+The picture of what applies at each stage is in [guardrails by stage](guardrails.md), generated from the rules so
+it cannot drift. Each rule's page in [`policy/`](policy/) shows its own row of ✅ and ▫️.
+
+**Making a guardrail stricter as products mature.** A rule can be a warning at one stage and a block later. Add
+`escalate` to the rule:
+
+```yaml
+- id: SEC-005
+  applies_from: pilot             # warns from pilot...
+  escalate: { production: block } # ...and blocks in production
+  severity: warn
+```
+
+Severity can only rise with the stage, never fall, and the escalation stage must come after `applies_from`.
+The PR comment tells the author both ways: *Heads up, this becomes blocking at Production* while they are at
+pilot, and *Stricter at this stage* once they are there. Advice-only areas still never block, whatever the rule
+says. The ⛔/⚠️/ℹ️ matrix on each policy page shows the severity at every stage.
+
+How a product declares its stage, and what you should know:
+- It writes `stage: pilot` in `.governance.yml` (or a `<!-- governance-stage: pilot -->` marker in its README, or a
+  platform-set repository variable). The strictest declaration wins.
+- **Not declared means production.** Forgetting never makes a product look safer than it is.
+- **A pull request can raise the stage, never lower it.** Raising it re-checks the whole product against the
+  guardrails it adds (a *promotion scan*), which is your readiness gate. Lowering it takes effect only after the
+  change is merged, so protect `.governance.yml` with CODEOWNERS like the waivers file.
+- **Later-stage findings are previewed, not counted.** The PR comment lists them under *Coming at a higher stage*
+  so teams see what is ahead. They cannot be waived or blocked early.
+- Promoting a rule to an earlier stage (say pilot to scan) tightens it for every scan-stage product at once.
+  Treat it like making a warning into a block: check the impact first.
 
 ## Approving changes
 
@@ -176,4 +217,5 @@ checks that the security policy page has the heading each rule links to.
 - [ ] In each consuming repo: ruleset requiring the `governed / governor` check
 - [ ] `waivers.require_approval: true` once there is a second approver
 - [ ] Pin consuming repos to a release tag instead of `@main` when you want controlled rollouts
+- [ ] Add `/.governance.yml` to the CODEOWNERS of each consuming repo (it sets the stage, like a waiver sets an exception)
 - [ ] Replace the example rules, policy pages, owners and contacts with real ones

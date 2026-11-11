@@ -14,6 +14,9 @@ inputs:
   full-scan:
     description: "'true' to judge every file instead of only what changed."
     default: "false"
+  stage:
+    description: "Optional product stage (scan, pilot, production) from a trusted repository setting."
+    default: ""
 
 outputs:
   domains:
@@ -38,6 +41,7 @@ runs:
         GOV_HEAD: ${{ inputs.head }}
         GOV_LABELS: ${{ inputs.labels }}
         GOV_FULL: ${{ inputs.full-scan }}
+        GOV_STAGE: ${{ inputs.stage }}
       run: |
         args=(--repo "$GITHUB_WORKSPACE" --out "$RUNNER_TEMP/governance/triage.json" --labels "$GOV_LABELS")
         if [ "$GOV_FULL" = "true" ]; then

@@ -3,6 +3,7 @@
 # whether a technology choice is wise, and it never declares a design aligned with strategy.
 rules:
   - id: EA-001
+    applies_from: scan
     title: Banned technology
     severity: block
     confidence: high
@@ -19,6 +20,8 @@ rules:
         # use the platform's built-in streams, or the catalogue's preferred alternative
 
   - id: EA-002
+    applies_from: pilot
+    escalate: { production: block }
     title: Deprecated technology
     severity: warn
     confidence: high
@@ -35,6 +38,8 @@ rules:
         "dependencies": { "date-fns": "^3.6.0" }
 
   - id: EA-003
+    applies_from: pilot
+    escalate: { production: block }
     title: Technology not in the catalogue
     severity: warn
     confidence: medium
@@ -51,6 +56,7 @@ rules:
         # choose an adopted option, or link the assessment request from your ADR
 
   - id: EA-004
+    applies_from: production
     title: Technology on trial or tolerated
     severity: info
     confidence: high
@@ -65,6 +71,7 @@ rules:
         # using a trial technology inside an internal tool, as its conditions allow
 
   - id: EA-005
+    applies_from: pilot
     title: Evidence missing for off-road technology
     severity: block
     confidence: high
@@ -81,6 +88,7 @@ rules:
         docs/adr/0007-use-htmx-for-internal-tools.md   # with Guidance consulted, Deviations, Tensions
 
   - id: EA-006
+    applies_from: production
     title: ADR incomplete
     severity: warn
     confidence: high

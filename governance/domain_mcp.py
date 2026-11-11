@@ -22,6 +22,8 @@ from pathlib import Path
 from typing import Any
 
 import yaml
+
+from .stages import STAGES, applies, parse as parse_stage, severity_at, severity_by_stage
 from mcp.server.mcpserver import MCPServer
 
 
@@ -36,6 +38,11 @@ class Knowledge:
             for n, line in enumerate((self.dir / "knowledge" / "rules.yml").read_text(encoding="utf-8").splitlines(), start=1)
             if (m := re.match(r"\s*-\s*id:\s*(\S+)", line))
         }
+        for r in self.rules:
+            r.setdefault("applies_from", "scan")
+            if r["applies_from"] not in STAGES:
+                raise ValueError(f"{r['id']}: applies_from must be one of {', '.join(STAGES)}")
+            r["severity_by_stage"] = severity_by_stage(r["severity"], r["applies_from"], r.get("escalate"), r["id"])
         self.version = self._version()
 
     def _version(self) -> str:
@@ -115,13 +122,18 @@ def build_server(domain_dir: Path) -> tuple[MCPServer, Knowledge]:
         return _j(k.domain_info())
 
     @mcp.tool()
-    def list_rules(severity: str | None = None) -> str:
-        """List every rule in this domain (id, title, severity, summary, tags). Optionally filter by
-        severity: block, warn or info."""
+    def list_rules(severity: str | None = None, stage: str | None = None) -> str:
+        """List every rule in this domain (id, title, severity, applies_from, summary, tags). Optionally filter
+        by severity (block, warn, info) and/or by product stage (scan, pilot, production) to see only the
+        guardrails that apply to a product at that stage, with the severity they have at that stage. A rule
+        applies from its stage onward, and some get stricter later (see severity_by_stage)."""
+        wanted = parse_stage(stage) if stage else None
         rules = [
-            {key: r.get(key) for key in ("id", "title", "severity", "summary", "tags", "confidence")}
+            {**{key: r.get(key) for key in ("id", "title", "severity", "applies_from", "severity_by_stage", "summary", "tags", "confidence")},
+             "severity": severity_at(r["severity_by_stage"], r["severity"], wanted) if wanted else r["severity"]}
             for r in k.rules
-            if severity is None or r["severity"] == severity
+            if (wanted is None or applies(r["applies_from"], wanted))
+            and (severity is None or (severity_at(r["severity_by_stage"], r["severity"], wanted) if wanted else r["severity"]) == severity)
         ]
         return _j(rules)
 
@@ -147,6 +159,8 @@ def build_server(domain_dir: Path) -> tuple[MCPServer, Knowledge]:
                         "tags": r.get("tags", []),
                         "guidance_url": k.guidance_url(r["id"]),
                         "policy_url": k.policy_url(r["id"]),
+                        "applies_from": r["applies_from"],
+                        "severity_by_stage": r["severity_by_stage"],
                     }
                     for r in matches
                 ],

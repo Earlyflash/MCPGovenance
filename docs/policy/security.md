@@ -1,14 +1,30 @@
 # Security policy
 
-> **PoC example.** In a real deployment this page is the human-written policy, owned by Security Engineering and published on the documentation site. Each section below is one rule. The machine-readable form used by the pipeline is [`rules.yml`](../../domains/security/knowledge/rules.yml); keep the two in step when either changes.
+> **PoC example.** In a real deployment this page is the human-written policy, owned by the domain team and published on the documentation site. This copy is generated from [`rules.yml`](../../domains/security/knowledge/rules.yml) by `python -m governance docs`, so the stage tables always match what the pipeline enforces.
 
-**Owner:** Security Engineering (PoC placeholder) · **Contact:** #security-help (placeholder) · **Enforcement:** rules marked *blocks the merge* stop a pull request until fixed or waived.
+**Owner:** Security Engineering (PoC placeholder) · **Contact:** #security-help (placeholder) · **Enforcement:** rules marked *Blocks the merge* stop a pull request until fixed or waived.
 
 **Exceptions:** Add an entry to .governance-waivers.yml (rule_id, optional path, reason, approver, expires within 90 days) and have the security domain owner approve the pull request. SEC-001 (secrets) can never be waived: remove the secret and rotate it.
 
+## Which guardrails apply to your product
+
+A product declares its stage (see [guardrails by stage](../guardrails.md)). A guardrail applies from the stage shown and to every later stage, so a production product has all of them.
+
+| Rule | 🔍 Scan | 🧪 Pilot | 🚀 Production |
+| --- | :---: | :---: | :---: |
+| [SEC-001 Hard-coded secret](#sec-001-hard-coded-secret) | ⛔ | ⛔ | ⛔ |
+| [SEC-002 Shell command built for execution](#sec-002-shell-command-built-for-execution) | ▫️ | ⚠️ | ⛔ |
+| [SEC-003 TLS certificate verification disabled](#sec-003-tls-certificate-verification-disabled) | ▫️ | ⛔ | ⛔ |
+| [SEC-004 Dynamic code evaluation](#sec-004-dynamic-code-evaluation) | ▫️ | ⛔ | ⛔ |
+| [SEC-005 Container runs as root](#sec-005-container-runs-as-root) | ▫️ | ⚠️ | ⛔ |
+| [SEC-006 Network rule open to the whole internet](#sec-006-network-rule-open-to-the-whole-internet) | ▫️ | ⚠️ | ⛔ |
+
+⛔ blocks the merge · ⚠️ warning · ℹ️ note · ▫️ does not apply yet
+
 ## SEC-001 Hard-coded secret
 
-**Effect:** Blocks the merge
+**Applies from:** 🔍 Scan  
+**By stage:** 🔍 Scan: ⛔ blocks the merge → 🧪 Pilot: ⛔ blocks the merge → 🚀 Production: ⛔ blocks the merge
 
 A credential, key or token is written into source control, where it is visible to everyone with read access and persists in history.
 
@@ -31,7 +47,8 @@ DB_PASSWORD = os.environ["DB_PASSWORD"]  # injected by the platform from the sec
 
 ## SEC-002 Shell command built for execution
 
-**Effect:** Warning
+**Applies from:** 🧪 Pilot  
+**By stage:** 🔍 Scan: ▫️ not yet → 🧪 Pilot: ⚠️ warning → 🚀 Production: ⛔ blocks the merge
 
 Running commands through a shell (shell=True, os.system) turns any untrusted input in the command into command injection.
 
@@ -53,7 +70,8 @@ subprocess.run(["convert", filename, "out.png"], check=True)
 
 ## SEC-003 TLS certificate verification disabled
 
-**Effect:** Blocks the merge
+**Applies from:** 🧪 Pilot  
+**By stage:** 🔍 Scan: ▫️ not yet → 🧪 Pilot: ⛔ blocks the merge → 🚀 Production: ⛔ blocks the merge
 
 Disabling certificate verification removes the protection HTTPS provides and allows man-in-the-middle attacks.
 
@@ -75,7 +93,8 @@ requests.get(url, verify="/etc/ssl/internal-ca.pem")
 
 ## SEC-004 Dynamic code evaluation
 
-**Effect:** Blocks the merge
+**Applies from:** 🧪 Pilot  
+**By stage:** 🔍 Scan: ▫️ not yet → 🧪 Pilot: ⛔ blocks the merge → 🚀 Production: ⛔ blocks the merge
 
 eval, exec and new Function run text as code, so any attacker-influenced string becomes arbitrary code execution.
 
@@ -98,7 +117,8 @@ value = ast.literal_eval(user_value)   # literals only, never code
 
 ## SEC-005 Container runs as root
 
-**Effect:** Warning
+**Applies from:** 🧪 Pilot  
+**By stage:** 🔍 Scan: ▫️ not yet → 🧪 Pilot: ⚠️ warning → 🚀 Production: ⛔ blocks the merge
 
 A container whose final stage has no non-root USER runs as root, which widens the impact of any compromise.
 
@@ -126,7 +146,8 @@ CMD ["python", "/app/app.py"]
 
 ## SEC-006 Network rule open to the whole internet
 
-**Effect:** Warning
+**Applies from:** 🧪 Pilot  
+**By stage:** 🔍 Scan: ▫️ not yet → 🧪 Pilot: ⚠️ warning → 🚀 Production: ⛔ blocks the merge
 
 A rule allowing 0.0.0.0/0 or ::/0 exposes the resource to every address on the internet.
 
@@ -145,3 +166,4 @@ Prefer:
 ```
 cidr_blocks = [var.office_cidr]
 ```
+

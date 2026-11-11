@@ -7,6 +7,7 @@ from typing import Any
 
 from .diff import ChangedFile, all_files, git_changed_files
 from .globs import match_any
+from .stages import detect_stage
 
 
 def triage(
@@ -16,8 +17,13 @@ def triage(
     head: str | None = None,
     labels: list[str] | None = None,
     full_scan: bool = False,
+    stage_override: str | None = None,
 ) -> dict[str, Any]:
     labels = labels or []
+    stage = detect_stage(repo, None if full_scan else base, policy, stage_override)
+    promotion_scan = False
+    if stage["promoted"] and not full_scan:
+        full_scan = promotion_scan = True  # moving up a stage: judge the whole product, not just this diff
     if full_scan:
         files = all_files(repo)
     else:
@@ -42,6 +48,8 @@ def triage(
         "head": head,
         "labels": labels,
         "full_scan": full_scan,
+        "promotion_scan": promotion_scan,
+        "stage": stage,
         "domains": domains,
         "files": [f.to_dict() for f in files],
     }

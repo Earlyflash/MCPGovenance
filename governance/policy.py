@@ -17,6 +17,7 @@ DEFAULTS: dict[str, Any] = {
     "ignore_paths": [],
     "precedence": [],
     "domains": {},
+    "stages": {"default": "production", "file": ".governance.yml"},
     "waivers": {
         "file": ".governance-waivers.yml",
         "max_days": 90,
@@ -31,6 +32,9 @@ def load_policy(path: str | Path) -> dict[str, Any]:
     policy = {**DEFAULTS, **raw}
     policy["enforcement"] = {**DEFAULTS["enforcement"], **(raw.get("enforcement") or {})}
     policy["waivers"] = {**DEFAULTS["waivers"], **(raw.get("waivers") or {})}
+    policy["stages"] = {**DEFAULTS["stages"], **(raw.get("stages") or {})}
+    if policy["stages"]["default"] not in ("scan", "pilot", "production"):
+        raise ValueError("stages.default must be scan, pilot or production")
     if policy["enforcement"]["mode"] not in ("enforce", "warn-only"):
         raise ValueError("enforcement.mode must be 'enforce' or 'warn-only'")
     if not policy["domains"]:

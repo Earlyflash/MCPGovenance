@@ -62,6 +62,15 @@ New domains should start as `advise` and move to `gate` by changing one line, on
 trust. Enterprise alignment is deliberately `evidence`: the pipeline requires an ADR for off-road technology, but
 it does not decide whether the choice was wise. That judgment stays with people.
 
+## Product stages
+
+Guardrails are staged to the maturity of the product: 🔍 scan → 🧪 pilot → 🚀 production. Each rule names the stage
+it starts to apply in (`applies_from`) and applies to every later stage. A product declares its stage in
+`.governance.yml`, a README marker, or a platform-set repository variable. Triage works out the stage (the strictest
+declaration wins, nothing declared means production, and a pull request can raise but never lower it). The
+governor then treats findings for later-stage guardrails as a preview: shown, never counted. A rule can also get stricter at a later stage (`escalate`), for example warning at pilot and blocking in production. Raising the stage
+triggers a full-repository promotion scan. See [guardrails.md](guardrails.md) for the picture.
+
 ## Properties that matter
 
 These are the parts to protect when changing the system.

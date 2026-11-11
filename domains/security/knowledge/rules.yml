@@ -2,6 +2,7 @@
 # The reviewer detects; this file explains. Owners change guidance with an ordinary pull request.
 rules:
   - id: SEC-001
+    applies_from: scan
     title: Hard-coded secret
     severity: block
     confidence: high
@@ -19,6 +20,8 @@ rules:
         DB_PASSWORD = os.environ["DB_PASSWORD"]  # injected by the platform from the secrets manager
 
   - id: SEC-002
+    applies_from: pilot
+    escalate: { production: block }
     title: Shell command built for execution
     severity: warn
     confidence: medium
@@ -35,6 +38,7 @@ rules:
         subprocess.run(["convert", filename, "out.png"], check=True)
 
   - id: SEC-003
+    applies_from: pilot
     title: TLS certificate verification disabled
     severity: block
     confidence: high
@@ -51,6 +55,7 @@ rules:
         requests.get(url, verify="/etc/ssl/internal-ca.pem")
 
   - id: SEC-004
+    applies_from: pilot
     title: Dynamic code evaluation
     severity: block
     confidence: medium
@@ -68,6 +73,8 @@ rules:
         value = ast.literal_eval(user_value)   # literals only, never code
 
   - id: SEC-005
+    applies_from: pilot
+    escalate: { production: block }
     title: Container runs as root
     severity: warn
     confidence: high
@@ -88,6 +95,8 @@ rules:
         CMD ["python", "/app/app.py"]
 
   - id: SEC-006
+    applies_from: pilot
+    escalate: { production: block }
     title: Network rule open to the whole internet
     severity: warn
     confidence: medium

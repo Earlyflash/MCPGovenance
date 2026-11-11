@@ -1,14 +1,30 @@
 # Enterprise technology alignment policy
 
-> **PoC example.** In a real deployment this page is the human-written policy, owned by the Office of the CTO and published on the documentation site. Each section below is one rule. The machine-readable form used by the pipeline is [`rules.yml`](../../domains/enterprise-alignment/knowledge/rules.yml); keep the two in step when either changes.
+> **PoC example.** In a real deployment this page is the human-written policy, owned by the domain team and published on the documentation site. This copy is generated from [`rules.yml`](../../domains/enterprise-alignment/knowledge/rules.yml) by `python -m governance docs`, so the stage tables always match what the pipeline enforces.
 
 **Owner:** Office of the CTO (PoC placeholder) · **Contact:** #architecture (placeholder) · **Enforcement:** checks that the required evidence exists; people judge whether the decision is right.
 
 **Exceptions:** Banned technology needs a waiver in .governance-waivers.yml approved by the Office of the CTO. For anything else off the paved road, add an ADR under docs/adr/ that records the guidance consulted, the deviation and any tension with strategy. This domain checks that the evidence exists, not that the decision is right: people judge that.
 
+## Which guardrails apply to your product
+
+A product declares its stage (see [guardrails by stage](../guardrails.md)). A guardrail applies from the stage shown and to every later stage, so a production product has all of them.
+
+| Rule | 🔍 Scan | 🧪 Pilot | 🚀 Production |
+| --- | :---: | :---: | :---: |
+| [EA-001 Banned technology](#ea-001-banned-technology) | ⛔ | ⛔ | ⛔ |
+| [EA-002 Deprecated technology](#ea-002-deprecated-technology) | ▫️ | ⚠️ | ⛔ |
+| [EA-003 Technology not in the catalogue](#ea-003-technology-not-in-the-catalogue) | ▫️ | ⚠️ | ⛔ |
+| [EA-004 Technology on trial or tolerated](#ea-004-technology-on-trial-or-tolerated) | ▫️ | ▫️ | ℹ️ |
+| [EA-005 Evidence missing for off-road technology](#ea-005-evidence-missing-for-off-road-technology) | ▫️ | ⛔ | ⛔ |
+| [EA-006 ADR incomplete](#ea-006-adr-incomplete) | ▫️ | ▫️ | ⚠️ |
+
+⛔ blocks the merge · ⚠️ warning · ℹ️ note · ▫️ does not apply yet
+
 ## EA-001 Banned technology
 
-**Effect:** Blocks the merge
+**Applies from:** 🔍 Scan  
+**By stage:** 🔍 Scan: ⛔ blocks the merge → 🧪 Pilot: ⛔ blocks the merge → 🚀 Production: ⛔ blocks the merge
 
 This technology is on the banned list in the technology catalogue.
 
@@ -30,7 +46,8 @@ Prefer:
 
 ## EA-002 Deprecated technology
 
-**Effect:** Warning
+**Applies from:** 🧪 Pilot  
+**By stage:** 🔍 Scan: ▫️ not yet → 🧪 Pilot: ⚠️ warning → 🚀 Production: ⛔ blocks the merge
 
 This technology is deprecated in the technology catalogue. New use is discouraged.
 
@@ -52,7 +69,8 @@ Prefer:
 
 ## EA-003 Technology not in the catalogue
 
-**Effect:** Warning
+**Applies from:** 🧪 Pilot  
+**By stage:** 🔍 Scan: ▫️ not yet → 🧪 Pilot: ⚠️ warning → 🚀 Production: ⛔ blocks the merge
 
 This technology is not in the technology catalogue, so it has not been assessed. Unknown is not the same as permitted.
 
@@ -74,7 +92,8 @@ Prefer:
 
 ## EA-004 Technology on trial or tolerated
 
-**Effect:** Note
+**Applies from:** 🚀 Production  
+**By stage:** 🔍 Scan: ▫️ not yet → 🧪 Pilot: ▫️ not yet → 🚀 Production: ℹ️ note
 
 This technology is allowed only under the conditions shown in the catalogue.
 
@@ -96,7 +115,8 @@ Prefer:
 
 ## EA-005 Evidence missing for off-road technology
 
-**Effect:** Blocks the merge
+**Applies from:** 🧪 Pilot  
+**By stage:** 🔍 Scan: ▫️ not yet → 🧪 Pilot: ⛔ blocks the merge → 🚀 Production: ⛔ blocks the merge
 
 The change introduces technology that is off the paved road, but no ADR is included to record the decision.
 
@@ -118,7 +138,8 @@ docs/adr/0007-use-htmx-for-internal-tools.md   # with Guidance consulted, Deviat
 
 ## EA-006 ADR incomplete
 
-**Effect:** Warning
+**Applies from:** 🚀 Production  
+**By stage:** 🔍 Scan: ▫️ not yet → 🧪 Pilot: ▫️ not yet → 🚀 Production: ⚠️ warning
 
 The ADR is missing a required section or still contains TBD.
 
@@ -141,3 +162,4 @@ Prefer:
 | --- | --- | --- |
 | htmx | 2026.11.1+ab12cd34 | trial, internal tools only |
 ```
+

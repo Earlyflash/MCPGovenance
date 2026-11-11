@@ -166,7 +166,8 @@ def test_unapproved_technology_is_flagged_and_asks_for_evidence(tmp_path):
 
 
 def test_adr_satisfies_evidence_but_not_a_ban(tmp_path):
-    v = run(tmp_path, {}, {"package.json": pkg(moment="^2", **{"left-pad": "^1"}), "docs/adr/0007-x.md": ADR_OK})
+    pilot = {".governance.yml": "stage: pilot\n"}  # deprecated and uncatalogued technology only warn before production
+    v = run(tmp_path, pilot, {"package.json": pkg(moment="^2", **{"left-pad": "^1"}), "docs/adr/0007-x.md": ADR_OK})
     assert rule_ids(v, "enterprise-alignment") == {"EA-002", "EA-003"}
     assert v["verdict"] == "pass-with-warnings"
     v2 = run(tmp_path / "b", {}, {"package.json": pkg(**{"event-stream": "^3"}), "docs/adr/0007-x.md": ADR_OK})

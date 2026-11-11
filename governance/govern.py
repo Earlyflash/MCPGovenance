@@ -17,6 +17,7 @@ import yaml
 
 from .findings import SEVERITY_RANK, effective_severity
 from .globs import match
+from .stages import applies as stage_applies, next_escalation, severity_at
 
 
 def load_waivers(path: Path | None) -> list[dict[str, Any]]:
@@ -125,11 +126,24 @@ def govern(
                 findings.append(f)
         domain_rows[d] = row
 
+    stage_info = triage.get("stage") or {"stage": policy.get("stages", {}).get("default", "production"), "source": "default", "promoted": False, "notes": []}
+    stage = stage_info["stage"]
     for f in findings:
         mode = domain_rows[f["domain"]]["mode"]
-        f["effective_severity"] = effective_severity(f["severity"], mode)
-        f["capped"] = f["effective_severity"] != f["severity"]
+        base = f["severity"]
+        declared = severity_at(f.get("severity_by_stage"), base, stage)  # may be stricter than the rule starts at
+        f["base_severity"] = base
+        f["severity"] = declared
+        f["effective_severity"] = effective_severity(declared, mode)
+        f["capped"] = f["effective_severity"] != declared
+        f["escalated"] = declared != base
         f["waived"] = False
+        f.setdefault("applies_from", "scan")
+        nxt = next_escalation(f.get("severity_by_stage"), base, stage)
+        later = effective_severity(nxt[1], mode) if nxt else None
+        f["escalates_at"] = {"stage": nxt[0], "severity": later} if nxt and SEVERITY_RANK[later] > SEVERITY_RANK[f["effective_severity"]] else None
+        # A guardrail for a later stage is shown as a preview but never counted, waived or enforced.
+        f["deferred"] = not stage_applies(f["applies_from"], stage)
 
     # Waivers
     problems: list[dict[str, str]] = []
@@ -141,7 +155,7 @@ def govern(
         else:
             valid.append(w)
     for f in findings:
-        if f["effective_severity"] == "info":
+        if f["effective_severity"] == "info" or f["deferred"]:
             continue
         for w in valid:
             if str(w["rule_id"]).upper() == f["rule_id"].upper() and match(f.get("file") or "", w.get("path", "**")):
@@ -150,9 +164,10 @@ def govern(
                                "new_in_pr": base_waivers is not None and not _same_waiver(w, base_waivers)}
                 break
 
-    active = [f for f in findings if not f["waived"]]
+    active = [f for f in findings if not f["waived"] and not f["deferred"]]
     counts = {s: sum(1 for f in active if f["effective_severity"] == s) for s in ("block", "warn", "info")}
     counts["waived"] = sum(1 for f in findings if f["waived"])
+    counts["deferred"] = sum(1 for f in findings if f["deferred"])
 
     # Several domains on one line: not a pass/fail matter, but a human should read them together.
     by_loc: dict[tuple[str, int], list[dict[str, Any]]] = {}
@@ -168,6 +183,7 @@ def govern(
         mine = [f for f in active if f["domain"] == d]
         row["counts"] = {s: sum(1 for f in mine if f["effective_severity"] == s) for s in ("block", "warn", "info")}
         row["counts"]["waived"] = sum(1 for f in findings if f["domain"] == d and f["waived"])
+        row["counts"]["deferred"] = sum(1 for f in findings if f["domain"] == d and f["deferred"])
 
     would_fail = counts["block"] > 0
     warn_only = policy["enforcement"]["mode"] == "warn-only"
@@ -185,6 +201,8 @@ def govern(
         "verdict": verdict,
         "changed_files": len([f for f in triage.get("files", []) if f.get("status") != "deleted"]),
         "full_scan": bool(triage.get("full_scan")),
+        "promotion_scan": bool(triage.get("promotion_scan")),
+        "stage": stage_info,
         "would_fail": would_fail,
         "enforcement": policy["enforcement"]["mode"],
         "counts": counts,

@@ -5,6 +5,8 @@ from __future__ import annotations
 import json
 from typing import Any
 
+from . import stages as st
+
 MARKER = "<!-- governance-governor:v1 -->"
 MAX_COMMENT_CHARS = 60_000
 MAX_EXEMPLARS = 8
@@ -52,11 +54,25 @@ def _domain_status(d: dict[str, Any]) -> str:
     return "✅ Clear"
 
 
+def _stage_note(f: dict[str, Any], stage: str | None) -> str:
+    """Tell the author when a guardrail gets stricter with the product's stage."""
+    if not stage:
+        return ""
+    if f.get("escalated") and not f.get("capped"):
+        return (f"⏫ **Stricter at this stage:** only a {SEV_LABEL[f['base_severity']].lower()} for products at {st.LABELS[f['applies_from']]}, "
+                f"but {SEV_LABEL[f['effective_severity']].lower()} for a {st.LABELS[stage]} product.")
+    nxt = f.get("escalates_at")
+    if nxt:
+        return (f"🔭 **Heads up:** this is a {SEV_LABEL[f['effective_severity']].lower()} for a {st.LABELS[stage]} product. "
+                f"At {st.ICONS[nxt['stage']]} {st.LABELS[nxt['stage']]} it becomes {SEV_LABEL[nxt['severity']].lower()}.")
+    return ""
+
+
 def _quote(lines: list[str]) -> list[str]:
     return [("> " + part) if part else ">" for l in lines for part in l.split("\n")]
 
 
-def _finding_md(f: dict[str, Any], show_exemplar: bool) -> list[str]:
+def _finding_md(f: dict[str, Any], show_exemplar: bool, stage: str | None = None) -> list[str]:
     sev = f["effective_severity"]
     loc = _loc(f)
     body = [f"**{SEV_ICON[sev]} {SEV_LABEL[sev]} · `{f['rule_id']}` · {f['title']}**  "]
@@ -68,6 +84,9 @@ def _finding_md(f: dict[str, Any], show_exemplar: bool) -> list[str]:
     if f.get("evidence"):
         body += [f"**Found:** `{f['evidence']}`".replace("``", "`"), ""]
     body += [f"**Why it matters:** {f['message']}", "", f"**How to fix:** {f['remediation']}"]
+    stage_note = _stage_note(f, stage)
+    if stage_note:
+        body += ["", stage_note]
     links = []
     if f.get("policy_url"):
         links.append(f"📘 [Read the policy ({f['rule_id']})]({f['policy_url']})")
@@ -92,14 +111,24 @@ def render_comment(v: dict[str, Any], ctx: dict[str, Any] | None = None) -> str:
 
     out = [MARKER, f"# {icon} Governance review: {headline}", "", f"_{blurb}_", ""]
 
+    stage = (v.get("stage") or {}).get("stage")
+    if stage:
+        info = v["stage"]
+        out += [f"**Product stage:** {st.ladder(stage)}  ", f"<sub>{st.MEANING[stage]}. Declared by: {info.get('source', 'unknown')}. "
+                f"Guardrails for a later stage are previewed below but do not count yet.</sub>", ""]
+        if v.get("promotion_scan"):
+            out += ["> [!IMPORTANT]", "> **Stage promotion.** This pull request raises the product's stage, so the whole repository was checked, not only the changed lines.", ""]
+        for n in info.get("notes", []):
+            out += ["> [!NOTE]", f"> {n}", ""]
+
     if not v["domains"]:
         out += ["No governance domains apply to the files in this pull request.", ""]
     else:
         scope = "the whole repository (full scan)" if v.get("full_scan") else f"{v.get('changed_files', 0)} changed file(s)"
         out += [
-            f"| ⛔ Blocking | ⚠️ Warnings | ℹ️ Notes | 🧾 Waived | 🔎 Reviewed |",
-            "| :---: | :---: | :---: | :---: | :---: |",
-            f"| **{c['block']}** | **{c['warn']}** | **{c['info']}** | **{c['waived']}** | {len(v['domains'])} domain(s), {scope} |",
+            f"| ⛔ Blocking | ⚠️ Warnings | ℹ️ Notes | 🧾 Waived | ⏭️ Later stages | 🔎 Reviewed |",
+            "| :---: | :---: | :---: | :---: | :---: | :---: |",
+            f"| **{c['block']}** | **{c['warn']}** | **{c['info']}** | **{c['waived']}** | **{c.get('deferred', 0)}** | {len(v['domains'])} domain(s), {scope} |",
             "",
             "Each domain reviews independently against its own guidance. This comment only collates the results.",
             "",
@@ -122,7 +151,7 @@ def render_comment(v: dict[str, Any], ctx: dict[str, Any] | None = None) -> str:
     exemplars_left = MAX_EXEMPLARS
     for d in v["domains"]:
         name = d["domain"]
-        mine = [f for f in v["findings"] if f["domain"] == name and not f["waived"]]
+        mine = [f for f in v["findings"] if f["domain"] == name and not f["waived"] and not f.get("deferred")]
         title = d.get("title") or name
         out.append(f"## {_domain_status(d).split(' ')[0]} {title}")
         out.append(f"<sub>`{name}` · `{d['mode']}` · owner: {d['owner']}" + (f" · {d['contact']}" if d.get("contact") else "") + f" · guidance `{d['guidance_version']}`" + (f" · [📘 policy]({d['policy_url']})" if d.get("policy_url") else "") + (f" · [📖 rules]({d['knowledge_url']})" if d.get("knowledge_url") else "") + "</sub>")
@@ -136,7 +165,7 @@ def render_comment(v: dict[str, Any], ctx: dict[str, Any] | None = None) -> str:
             show = exemplars_left > 0 and f["effective_severity"] in ("block", "warn")
             if show:
                 exemplars_left -= 1
-            md = _finding_md(f, show)
+            md = _finding_md(f, show, stage)
             if f["effective_severity"] == "warn":
                 warns_shown += 1
                 if warns_shown > OPEN_WARNINGS:
@@ -157,6 +186,19 @@ def render_comment(v: dict[str, Any], ctx: dict[str, Any] | None = None) -> str:
         if any(f["waiver"].get("new_in_pr") for f in waived):
             out += ["> [!IMPORTANT]", "> A waiver in this pull request is applied provisionally. It only becomes permanent when the governance code owner approves the change to the waivers file and the PR merges.", ""]
         out += ["<sub>Waived findings stay visible until they expire.</sub>", ""]
+
+    later = [f for f in v["findings"] if f.get("deferred")]
+    if later and stage:
+        nxt = st.STAGES[min(st.rank(stage) + 1, len(st.STAGES) - 1)]
+        out += ["## ⏭️ Coming at a higher stage", "",
+                f"These are real problems in this change, but the guardrail starts to apply at a later stage than **{st.LABELS[stage]}**, "
+                "so they do not count towards the result today. They will when the product moves up.", "",
+                "| Applies from | Rule | Where | Effect then | Policy |", "| --- | --- | --- | --- | --- |"]
+        for f in sorted(later, key=lambda x: (st.rank(x["applies_from"]), x["rule_id"])):
+            mode_sev = SEV_LABEL[f["effective_severity"]]
+            pol = f"[read]({f['policy_url']})" if f.get("policy_url") else ""
+            out.append(f"| {st.ICONS[f['applies_from']]} {st.LABELS[f['applies_from']]} | `{f['rule_id']}` {f['title']} | {_loc(f) or 'n/a'} | {mode_sev} | {pol} |")
+        out += ["", f"<sub>Moving to {st.LABELS[nxt]} adds guardrails; set the stage in `.governance.yml`.</sub>" if nxt != stage else "", ""]
 
     if v["waiver_problems"]:
         out += ["> [!IMPORTANT]", "> **Waivers that did not apply**", ">"]
@@ -195,7 +237,7 @@ def render_comment(v: dict[str, Any], ctx: dict[str, Any] | None = None) -> str:
         for f in v["findings"] if not f["waived"] and f["effective_severity"] in ("block", "warn")
     ][:50]
     out += ["<details><summary>🤖 Machine-readable findings (for agents fixing this PR)</summary>", "", "```json",
-            json.dumps({"verdict": v["verdict"], "findings": compact}, indent=2), "```", "", "</details>", ""]
+            json.dumps({"verdict": v["verdict"], "stage": stage, "findings": compact}, indent=2), "```", "", "</details>", ""]
 
     foot = []
     if v["not_triggered"]:

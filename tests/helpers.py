@@ -54,10 +54,11 @@ def pipeline(
     labels: list[str] | None = None,
     full: bool = False,
     today: dt.date | None = None,
+    stage: str | None = None,
 ) -> dict[str, Any]:
     policy_path = Path(policy or ROOT / "policy.yml")
     pol = load_policy(policy_path)
-    data = triage(repo, pol, base, head, labels or [], full)
+    data = triage(repo, pol, base, head, labels or [], full, stage)
     out.mkdir(parents=True, exist_ok=True)
     tp = out / "triage.json"
     tp.write_text(json.dumps(data), encoding="utf-8")
