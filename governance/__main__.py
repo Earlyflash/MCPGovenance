@@ -145,6 +145,9 @@ def cmd_demand(a: argparse.Namespace) -> int:
     print(text)
     if a.out:
         Path(a.out).write_text(demand.render(summary), encoding="utf-8")
+    if a.html:
+        Path(a.html).write_text(demand.render_html(summary), encoding="utf-8")
+        print(f"wrote {a.html}", file=sys.stderr)
     return 0
 
 
@@ -211,6 +214,7 @@ def main(argv: list[str] | None = None) -> int:
     dm.add_argument("--top", type=int, default=10)
     dm.add_argument("--json", action="store_true")
     dm.add_argument("--out", help="also write the markdown report here")
+    dm.add_argument("--html", help="write a self-contained, visual HTML report here")
     dm.set_defaults(fn=cmd_demand)
 
     a = p.parse_args(argv)

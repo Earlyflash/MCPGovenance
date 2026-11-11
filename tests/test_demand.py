@@ -76,3 +76,10 @@ def test_records_hold_no_file_contents(tmp_path, monkeypatch):
     log = tmp_path / "demand.jsonl"
     ask("security", "get_guidance", "copilot", monkeypatch, log, query="SEC-001")
     assert set(rows(log)[0]) == {"ts", "domain", "tool", "question", "answered", "matched", "caller", "repo", "stage"}
+
+
+def test_html_report_is_self_contained_and_escapes_questions():
+    base = {"domain": "security", "tool": "get_guidance", "matched": [], "repo": "r", "stage": "", "ts": "2026-11-01T10:00:00Z", "caller": "copilot"}
+    page = demand.render_html(demand.summarise([{**base, "question": "<script>x</script>", "answered": False}]))
+    assert "<script>x</script>" not in page and "&lt;script&gt;" in page
+    assert "Write these first" in page and "http" not in page.replace("http-equiv", "")
