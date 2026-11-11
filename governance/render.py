@@ -119,6 +119,8 @@ def render_comment(v: dict[str, Any], ctx: dict[str, Any] | None = None) -> str:
         if v.get("promotion_scan"):
             out += ["> [!IMPORTANT]", "> **Stage promotion.** This pull request raises the product's stage, so the whole repository was checked, not only the changed lines.", ""]
         for n in info.get("notes", []):
+            if v.get("promotion_scan") and "raises the stage" in n:
+                continue  # the promotion alert above already says this
             out += ["> [!NOTE]", f"> {n}", ""]
 
     if not v["domains"]:
