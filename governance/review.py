@@ -88,6 +88,9 @@ async def review_domain(domain_id: str, root: Path, repo: Path, triage_data: dic
             owner=info["owner"],
             guidance_version=info["guidance_version"],
             status="ok",
+            title=info.get("title", ""),
+            contact=info.get("contact", ""),
+            knowledge_url=info.get("knowledge_url", ""),
             findings=[f.to_dict() for f in findings],
             stats={"files_considered": len(ctx.live_files()), "rules_available": len(rules), "full_scan": full},
         )

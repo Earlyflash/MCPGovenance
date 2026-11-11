@@ -84,14 +84,17 @@ def govern(
     for d in expected:
         required = (policy["domains"].get(d) or {}).get("required", True)
         path = Path(results_dir) / f"findings-{d}.json"
-        row = {"domain": d, "mode": "unknown", "owner": "unknown", "guidance_version": "unknown", "status": "missing", "waiver_route": ""}
+        row = {"domain": d, "mode": "unknown", "owner": "unknown", "guidance_version": "unknown", "status": "missing", "waiver_route": "",
+               "title": d, "contact": "", "knowledge_url": "", "files_considered": None}
         if not path.is_file():
             findings.append(_synthetic(d, "GOV-001", "Reviewer did not report",
                                        f"The {d} reviewer produced no result, so this domain could not be checked.",
                                        "block" if required else "warn"))
         else:
             res = json.loads(path.read_text(encoding="utf-8"))
-            row.update(mode=res["mode"], owner=res["owner"], guidance_version=res["guidance_version"], status=res["status"])
+            row.update(mode=res["mode"], owner=res["owner"], guidance_version=res["guidance_version"], status=res["status"],
+                       title=res.get("title") or d, contact=res.get("contact", ""), knowledge_url=res.get("knowledge_url", ""),
+                       files_considered=(res.get("stats") or {}).get("files_considered"))
             if res["status"] != "ok":
                 findings.append(_synthetic(d, "GOV-002", "Reviewer failed", f"The {d} reviewer failed: {res.get('error', 'unknown error')}",
                                            "block" if required else "warn", res["owner"]))
@@ -157,6 +160,8 @@ def govern(
 
     return {
         "verdict": verdict,
+        "changed_files": len([f for f in triage.get("files", []) if f.get("status") != "deleted"]),
+        "full_scan": bool(triage.get("full_scan")),
         "would_fail": would_fail,
         "enforcement": policy["enforcement"]["mode"],
         "counts": counts,

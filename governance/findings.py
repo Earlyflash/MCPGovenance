@@ -42,6 +42,9 @@ class DomainResult:
     findings: list[dict[str, Any]] = field(default_factory=list)
     stats: dict[str, Any] = field(default_factory=dict)
     error: str = ""
+    title: str = ""
+    contact: str = ""
+    knowledge_url: str = ""
 
     def to_dict(self) -> dict[str, Any]:
         d = asdict(self)

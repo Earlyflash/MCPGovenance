@@ -117,7 +117,7 @@ def waived(tmp_path, w, *, rule="SEC-002", severity="warn", pol=None, approvals=
 def test_valid_waiver_suppresses_a_finding_and_stays_visible(tmp_path):
     v = waived(tmp_path, waiver(path="scripts/**"))
     assert v["counts"]["warn"] == 0 and v["counts"]["waived"] == 1 and v["verdict"] == "pass"
-    assert "### Waived" in render_comment(v) and "octocat" in render_comment(v)
+    assert "## 🧾 Waived" in render_comment(v) and "octocat" in render_comment(v)
 
 
 def test_waiver_path_scoping(tmp_path):
@@ -177,3 +177,12 @@ def test_pipeline_findings_conform_to_the_published_schema(tmp_path):
     for f in v["findings"]:
         schema_view = {k: f[k] for k in f if k in schema["properties"]}
         jsonschema.validate(schema_view, schema)
+
+
+def test_comment_has_banner_scoreboard_and_next_steps(tmp_path):
+    result(tmp_path, "security", "gate", [finding(exemplar_good="requests.get(u)")])
+    v = govern(policy(), triage("security"), tmp_path, today=TODAY)
+    c = render_comment(v, {"run_url": "https://example.test/run/1", "head": "abc1234"})
+    assert "# ⛔ Governance review: Blocked" in c and "[!CAUTION]" in c
+    assert "### Scoreboard" in c and "| **security** |" in c
+    assert "### What to do next" in c and "[workflow run](https://example.test/run/1)" in c and "abc1234" in c

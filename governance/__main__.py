@@ -61,7 +61,9 @@ def _govern(a_policy: str, triage_path: Path, results: Path, repo: Path, out: Pa
         except github_api.GitHubError as exc:
             print(f"warning: could not read PR approvals: {exc}", file=sys.stderr)
     verdict = govern(policy, triage_data, results, waivers, approvals, today)
-    comment = render_comment(verdict)
+    server, run_id = os.environ.get("GITHUB_SERVER_URL", "https://github.com"), os.environ.get("GITHUB_RUN_ID")
+    run_url = f"{server}/{slug}/actions/runs/{run_id}" if slug and run_id else ""
+    comment = render_comment(verdict, {"run_url": run_url, "head": (triage_data.get("head") or "")[:7]})
     out.mkdir(parents=True, exist_ok=True)
     (out / "verdict.json").write_text(json.dumps(verdict, indent=2), encoding="utf-8")
     (out / "comment.md").write_text(comment, encoding="utf-8")
