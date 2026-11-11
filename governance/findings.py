@@ -27,6 +27,7 @@ class Finding:
     exemplar_good: str = ""
     confidence: str = "medium"  # high | medium | low
     check_type: str = "deterministic"  # deterministic | agent
+    guidance_url: str = ""  # link to this rule in the domain's guidance
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)

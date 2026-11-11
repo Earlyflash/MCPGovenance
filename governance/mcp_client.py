@@ -24,7 +24,7 @@ class DomainClient:
     async def call(self, tool: str, **arguments: Any) -> Any:
         result = await self._session.call_tool(tool, arguments)
         text = "".join(c.text for c in result.content if getattr(c, "type", "") == "text")
-        if result.isError:
+        if result.is_error:
             raise MCPCallError(f"{tool} failed: {text}")
         try:
             return json.loads(text)

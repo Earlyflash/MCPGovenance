@@ -116,7 +116,7 @@ with a valid waiver passed with the waiver listed. See the
 
 ## Pitfalls seen while building it
 
-- Installing `mcp` without a pin pulled a 2.x release that removed the FastMCP import path. It is pinned `<2`.
+- An unpinned `mcp` install jumped from 1.x to 2.x, which renamed `FastMCP` to `MCPServer` and `isError` to `is_error`. It is now pinned `>=2,<3`: the import is `mcp.server.mcpserver.MCPServer` and results use `is_error`.
 - A technology lookup must be restricted to the requested ecosystem, or an npm package can match a Python one.
 - A JSON dependency added at the end of a list also edits the previous line (trailing comma); compare dependency
   sets rather than lines.

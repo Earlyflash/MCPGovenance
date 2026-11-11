@@ -68,6 +68,8 @@ def _finding_md(f: dict[str, Any], show_exemplar: bool) -> list[str]:
     if f.get("evidence"):
         body += [f"**Found:** `{f['evidence']}`".replace("``", "`"), ""]
     body += [f"**Why it matters:** {f['message']}", "", f"**How to fix:** {f['remediation']}"]
+    if f.get("guidance_url"):
+        body += ["", f"📖 **Guidance:** [{f['rule_id']} in the {f['domain']} guidance]({f['guidance_url']})"]
     if show_exemplar and f.get("exemplar_good"):
         body += ["", "<details><summary>What good looks like</summary>", "", "```", *f["exemplar_good"].rstrip().splitlines(), "```", "", "</details>"]
     alert = {"block": "CAUTION", "warn": "WARNING", "info": "NOTE"}[sev]
@@ -118,7 +120,7 @@ def render_comment(v: dict[str, Any], ctx: dict[str, Any] | None = None) -> str:
         mine = [f for f in v["findings"] if f["domain"] == name and not f["waived"]]
         title = d.get("title") or name
         out.append(f"## {_domain_status(d).split(' ')[0]} {title}")
-        out.append(f"<sub>`{name}` · `{d['mode']}` · owner: {d['owner']}" + (f" · {d['contact']}" if d.get("contact") else "") + f" · guidance `{d['guidance_version']}`</sub>")
+        out.append(f"<sub>`{name}` · `{d['mode']}` · owner: {d['owner']}" + (f" · {d['contact']}" if d.get("contact") else "") + f" · guidance `{d['guidance_version']}`" + (f" ([read it]({d['knowledge_url']}))" if d.get("knowledge_url") else "") + "</sub>")
         out.append("")
         if not mine:
             out += ["No findings. Nothing to do here.", ""]

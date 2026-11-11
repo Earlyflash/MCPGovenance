@@ -186,3 +186,12 @@ def test_comment_has_banner_scoreboard_and_next_steps(tmp_path):
     assert "# ⛔ Governance review: Blocked" in c and "[!CAUTION]" in c
     assert "### Scoreboard" in c and "| **security** |" in c
     assert "### What to do next" in c and "[workflow run](https://example.test/run/1)" in c and "abc1234" in c
+
+
+def test_every_finding_links_to_its_guidance(tmp_path):
+    repo, b, h = make_pr(tmp_path, {}, {"app.py": 'requests.get(u, verify=False)\n'})
+    v = pipeline(repo, b, h, tmp_path / "out")
+    f = v["findings"][0]
+    assert f["guidance_url"].endswith("security/knowledge/rules.yml#L" + f["guidance_url"].rsplit("#L", 1)[1])
+    assert "#L" in f["guidance_url"]
+    assert f"({f['guidance_url']})" in render_comment(v)

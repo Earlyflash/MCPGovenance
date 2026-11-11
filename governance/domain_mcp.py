@@ -22,7 +22,7 @@ from pathlib import Path
 from typing import Any
 
 import yaml
-from mcp.server.fastmcp import FastMCP
+from mcp.server.mcpserver import MCPServer
 
 
 class Knowledge:
@@ -31,6 +31,11 @@ class Knowledge:
         self.info: dict[str, Any] = yaml.safe_load((self.dir / "domain.yml").read_text(encoding="utf-8"))
         rules_doc = yaml.safe_load((self.dir / "knowledge" / "rules.yml").read_text(encoding="utf-8"))
         self.rules: list[dict[str, Any]] = rules_doc["rules"]
+        self._lines = {
+            m.group(1).upper(): n
+            for n, line in enumerate((self.dir / "knowledge" / "rules.yml").read_text(encoding="utf-8").splitlines(), start=1)
+            if (m := re.match(r"\s*-\s*id:\s*(\S+)", line))
+        }
         self.version = self._version()
 
     def _version(self) -> str:
@@ -54,6 +59,12 @@ class Knowledge:
             "knowledge_url": i.get("knowledge_url", ""),
             "rule_count": len(self.rules),
         }
+
+    def guidance_url(self, rule_id: str) -> str:
+        """A link to the rule's own lines in the knowledge file (empty if the domain has no knowledge_url)."""
+        base = self.info.get("knowledge_url", "")
+        line = self._lines.get(rule_id.upper())
+        return f"{base}#L{line}" if base and line else base
 
     def rule(self, rule_id: str) -> dict[str, Any] | None:
         for r in self.rules:
@@ -80,9 +91,9 @@ def _j(obj: Any) -> str:
     return json.dumps(obj, ensure_ascii=False)
 
 
-def build_server(domain_dir: Path) -> tuple[FastMCP, Knowledge]:
+def build_server(domain_dir: Path) -> tuple[MCPServer, Knowledge]:
     k = Knowledge(domain_dir)
-    mcp = FastMCP(f"{k.info['id']}-guidance", log_level="WARNING")
+    mcp = MCPServer(f"{k.info['id']}-guidance", log_level="WARNING")
 
     @mcp.tool()
     def get_domain_info() -> str:
@@ -121,6 +132,7 @@ def build_server(domain_dir: Path) -> tuple[FastMCP, Knowledge]:
                         "guidance": r.get("guidance", ""),
                         "remediation": r.get("remediation", ""),
                         "tags": r.get("tags", []),
+                        "guidance_url": k.guidance_url(r["id"]),
                     }
                     for r in matches
                 ],
