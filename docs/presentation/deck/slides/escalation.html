@@ -1,0 +1,15 @@
+<section id="escalation" data-transition="fade" style="background:#F5F4EF;color:#14202E;font-family:Inter, Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;justify-content:space-between;gap:48px">
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:72px;font-weight:600;line-height:1.1">A warning today can be a block tomorrow</h2>
+<table style="font-size:30px;color:#14202E">
+<tr><th style="width:46%;text-align:left;font-weight:600">Guardrail</th><th style="width:18%;text-align:left;font-weight:600">Scan</th><th style="width:18%;text-align:left;font-weight:600">Pilot</th><th style="width:18%;text-align:left;font-weight:600">Production</th></tr>
+<tr><td>SEC-001 Hard-coded secret</td><td style="font-weight:600">Blocks</td><td style="font-weight:600">Blocks</td><td style="font-weight:600">Blocks</td></tr>
+<tr style="background:#ECE9DC"><td>SEC-005 Container runs as root</td><td style="color:#5A6572">Not yet</td><td>Warning</td><td style="font-weight:600">Blocks</td></tr>
+<tr><td>EA-003 Technology not in the catalogue</td><td style="color:#5A6572">Not yet</td><td>Warning</td><td style="font-weight:600">Blocks</td></tr>
+<tr><td>A11Y-004 Vague link text (advice only)</td><td style="color:#5A6572">Not yet</td><td style="color:#5A6572">Not yet</td><td>Warning</td></tr>
+</table>
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:32px;line-height:1.4">The comment warns early: “At Production this becomes blocking.”</p>
+<p style="font-size:32px;line-height:1.4;color:#5A6572">Raising the stage re-checks the whole repository, so promotion becomes a readiness gate.</p>
+</div>
+<aside>About 1 minute. Some guardrails apply only from a later stage, and some get stricter. The container running as root is a good example: a warning for a pilot, a block for production. Accessibility is advice-only, so even its blocking rules show as warnings. The developer is told early, so they fix it before the last minute. In the demo, the promotion pull request shows this live.</aside>
+</section>

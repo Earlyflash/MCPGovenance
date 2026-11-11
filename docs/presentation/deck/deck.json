@@ -1,0 +1,52 @@
+{
+  "v": 4,
+  "createdOnFiles": {
+    "v": 1,
+    "at": "2026-11-11T21:30:00Z"
+  },
+  "lists": "css",
+  "title": "PR governance: guardrails that grow with your product",
+  "order": [
+    "cover",
+    "problem",
+    "how",
+    "layers",
+    "developer",
+    "stages",
+    "escalation",
+    "trust",
+    "policy-flow",
+    "demand",
+    "demo-map",
+    "next"
+  ],
+  "sections": {
+    "s1": {
+      "description": "Why we need it and how it works.",
+      "start": "cover"
+    },
+    "s2": {
+      "description": "What developers and governance teams experience.",
+      "start": "developer"
+    },
+    "s3": {
+      "description": "Stages, escalation and trust.",
+      "start": "stages"
+    },
+    "s4": {
+      "description": "The demo and what we need from you.",
+      "start": "demo-map"
+    }
+  },
+  "faces": {
+    "space-grotesk": {
+      "family": "Space Grotesk",
+      "href": "https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400..700&display=swap"
+    },
+    "inter": {
+      "family": "Inter",
+      "href": "https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap"
+    }
+  },
+  "designSystems": []
+}

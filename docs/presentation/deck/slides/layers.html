@@ -1,0 +1,14 @@
+<section id="layers" data-transition="fade" style="background:#F5F4EF;color:#14202E;font-family:Inter, Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;justify-content:space-between;gap:48px">
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:72px;font-weight:600;line-height:1.1">Three layers, three owners</h2>
+<table style="font-size:30px;color:#14202E">
+<tr><th style="width:18%;text-align:left;font-weight:600">Layer</th><th style="width:34%;text-align:left;font-weight:600">The question it answers</th><th style="width:24%;text-align:left;font-weight:600">Owned by</th><th style="width:24%;text-align:left;font-weight:600">Changes when</th></tr>
+<tr><td style="font-weight:600">Knowledge</td><td>What does good look like?</td><td>Each domain team</td><td>Their guidance changes</td></tr>
+<tr><td style="font-weight:600">Judgment</td><td>Does this change meet it?</td><td>Each domain team</td><td>Detection improves</td></tr>
+<tr><td style="font-weight:600">Synthesis</td><td>What do we do with all the answers?</td><td>Office of the CTO</td><td>Governance policy changes</td></tr>
+</table>
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-size:32px;line-height:1.4">A domain team can change its rules without touching CI. The platform can tighten policy without understanding accessibility.</p>
+<p style="font-size:28px;line-height:1.4;background:#F2B544;border-radius:12px;padding:20px 28px"><b>The industry calls the knowledge layer a “context layer”.</b> Gartner describes it as the infrastructure that feeds enterprise knowledge into AI agents, coding agents included. This is ours, with the pull request as the point of use.</p>
+</div>
+<aside>About 1 minute. Gartner’s data and analytics research talks about a context layer (and a semantic layer) as the new critical infrastructure that joins enterprise knowledge to agentic AI. Other writers say knowledge layer or intelligence layer. Our knowledge layer is that idea applied to engineering: each domain publishes what good looks like once, in a form agents and people can both read. Check the exact Gartner wording and cite the current research note before the session, as I could only confirm the term “context layer”. This separation is the central design choice. Knowledge is plain YAML that the domain team owns and changes by pull request. Judgment is a small reviewer that detects violations. Synthesis is the governor, which only collates and applies organisation-wide rules about strictness. Neither side can quietly weaken the other.</aside>
+</section>

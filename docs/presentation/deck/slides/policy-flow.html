@@ -1,0 +1,30 @@
+<section id="policy-flow" data-transition="fade" style="background:#F5F4EF;color:#14202E;font-family:Inter, Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;justify-content:space-between;gap:48px">
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:72px;font-weight:600;line-height:1.1">How a policy becomes a guardrail</h2>
+<div style="display:flex;align-items:stretch;gap:16px">
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;background:#FFFEFA;border:1px solid #DAD8CF;border-radius:16px;padding:32px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;color:#5A6572">1</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:36px;font-weight:600">Compliance writes policy</h3>
+<p style="font-size:26px;line-height:1.4;color:#5A6572">In plain language, on the docs site.</p>
+</div>
+<x-shape kind="arrow-right" style="background:#14202E;width:40px;height:28px"></x-shape>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;background:#FFFEFA;border:1px solid #DAD8CF;border-radius:16px;padding:32px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;color:#5A6572">2</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:36px;font-weight:600">Turned into a rule</h3>
+<p style="font-size:26px;line-height:1.4;color:#5A6572">Guidance in YAML, plus a detector if it can be automated.</p>
+</div>
+<x-shape kind="arrow-right" style="background:#14202E;width:40px;height:28px"></x-shape>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;background:#FFFEFA;border:1px solid #DAD8CF;border-radius:16px;padding:32px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px;color:#5A6572">3</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:36px;font-weight:600">Governance approves</h3>
+<p style="font-size:26px;line-height:1.4;color:#5A6572">A pull request that the owning team must approve.</p>
+</div>
+<x-shape kind="arrow-right" style="background:#14202E;width:40px;height:28px"></x-shape>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;background:#F2B544;border-radius:16px;padding:32px">
+<p style="font-size:24px;font-weight:600;letter-spacing:3px">4</p>
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:36px;font-weight:600">Live everywhere</h3>
+<p style="font-size:26px;line-height:1.4">Every pull request is checked from its next run.</p>
+</div>
+</div>
+<p style="font-size:30px;line-height:1.4"><b>Exceptions:</b> a waiver file in the product’s repo, approved by the governance team through code owners. Dated, narrow and visible.</p>
+<aside>About 1 minute. Be precise here, because it is a common misunderstanding: the guidance is mostly YAML, not code. Code is needed only where a rule can be checked automatically, and then it is a small detector. A waiver is approved once but it expires, after at most 90 days, and it covers every matching finding in its path for that time, so approvers should insist on narrow paths. Be honest that the code owner approval only becomes enforced when a branch ruleset requires it, which is not set up yet in the proof of concept.</aside>
+</section>

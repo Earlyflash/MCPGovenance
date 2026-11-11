@@ -8,6 +8,10 @@ The demo consumer is [MCPGovenance-DemoApp](https://github.com/Earlyflash/MCPGov
 
 For the reasoning, the step-by-step flow and the properties to protect, read [docs/how-it-works.md](docs/how-it-works.md). To add rules, change policy or add a new area, read [docs/extending.md](docs/extending.md).
 
+**Presenting it:** [slides and speaker notes](docs/presentation/slides.md) and a [demo script](docs/presentation/demo-script.md).
+
+**Worked example (human guide or interview to policy to YAML):** [docs/examples/from-guide-to-rules.md](docs/examples/from-guide-to-rules.md). A sample [demand report](docs/examples/demand-report-sample.html) is alongside it (download and open in a browser; made by `scripts/simulate_demand.py`).
+
 **Where it could go:** [docs/roadmap.md](docs/roadmap.md) (ideas, not commitments).
 
 **Guardrails by product stage** (scan → pilot → production, with the stage matrix): [docs/guardrails.md](docs/guardrails.md).

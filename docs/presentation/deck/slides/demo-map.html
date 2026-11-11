@@ -1,0 +1,15 @@
+<section id="demo-map" data-transition="fade" style="background:#101C2C;color:#F5F4EF;font-family:Inter, Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;justify-content:space-between;gap:48px">
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:72px;font-weight:600;line-height:1.1">Demo: seven pull requests, one demo app</h2>
+<table style="font-size:28px;color:#F5F4EF">
+<tr style="background:#1A2A3F"><th style="width:8%;text-align:left;font-weight:600">PR</th><th style="width:36%;text-align:left;font-weight:600">What changes</th><th style="width:56%;text-align:left;font-weight:600">What you should see</th></tr>
+<tr><td>1</td><td>Docs only</td><td>Passes. Only security runs.</td></tr>
+<tr style="background:#16253A"><td>2</td><td>Approved dependency</td><td>Passes. No findings.</td></tr>
+<tr><td>3</td><td>Secret, no TLS check, eval</td><td style="color:#F2B544;font-weight:600">Blocked by security.</td></tr>
+<tr style="background:#16253A"><td>4</td><td>Inaccessible page</td><td>Warnings only, plus a preview of a later stage.</td></tr>
+<tr><td>5</td><td>Banned and unknown packages</td><td style="color:#F2B544;font-weight:600">Blocked. Warnings say they will block later.</td></tr>
+<tr style="background:#16253A"><td>6</td><td>Shell call with a waiver</td><td>Passes. The waiver is listed.</td></tr>
+<tr><td>7</td><td>Pilot to production</td><td style="color:#F2B544;font-weight:600">Blocked. Whole repo re-checked.</td></tr>
+</table>
+<p style="font-size:28px;color:#B7C3D0">Order for the live demo: 3, then 5, then 7. The others are there to open if asked.</p>
+<aside>Hand over to the live demo here, using the separate demo script. If the live view is slow, the comments on these pull requests are already posted and can be opened directly.</aside>
+</section>

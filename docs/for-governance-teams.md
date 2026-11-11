@@ -38,6 +38,8 @@ touch it unless you are adding a new area.
 
 ## Turning policy into guidance
 
+Starting from a raw guide or an interview instead of finished policy? See the worked example in [examples/from-guide-to-rules.md](examples/from-guide-to-rules.md).
+
 A written policy statement becomes one **rule**. For each rule decide:
 
 | Question | Becomes |

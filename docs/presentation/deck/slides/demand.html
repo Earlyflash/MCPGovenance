@@ -1,0 +1,22 @@
+<section id="demand" data-transition="fade" style="background:#101C2C;color:#F5F4EF;font-family:Inter, Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;justify-content:space-between;gap:48px">
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:72px;font-weight:600;line-height:1.1">What people ask for becomes what we build</h2>
+<div style="display:flex;align-items:stretch;gap:16px">
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;background:#1A2A3F;border:1px solid #2C405A;border-radius:16px;padding:32px">
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:36px;font-weight:600;color:#F2B544">Ask</h3>
+<p style="font-size:26px;line-height:1.4;color:#D5DDE6">Developers and agents query the guidance: a rule, a topic or a technology.</p>
+</div>
+<x-shape kind="arrow-right" style="background:#F5F4EF;width:40px;height:28px"></x-shape>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;background:#1A2A3F;border:1px solid #2C405A;border-radius:16px;padding:32px">
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:36px;font-weight:600;color:#F2B544">Record</h3>
+<p style="font-size:26px;line-height:1.4;color:#D5DDE6">One small record per question: who, which area, answered or not. No code.</p>
+</div>
+<x-shape kind="arrow-right" style="background:#F5F4EF;width:40px;height:28px"></x-shape>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;background:#F2B544;color:#14202E;border-radius:16px;padding:32px">
+<h3 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:36px;font-weight:600">Rank</h3>
+<p style="font-size:26px;line-height:1.4">Questions with no answer, ranked, become each team’s backlog.</p>
+</div>
+</div>
+<p style="font-size:30px;line-height:1.4">Example from the proof of concept: “kafka message queue” asked twice, no guidance. <b>That is the next guardrail to write.</b></p>
+<p style="font-size:26px;line-height:1.4;color:#B7C3D0">Built as a small proof of concept. Reported by team or repo, never by person.</p>
+<aside>About 1 minute. Every question to the knowledge layer is a statement of need, and normally it is lost. We record it, with no file contents and no names, and rank what we could not answer. That tells each governance team what to write next, and tells us where to invest. It also fits the industry idea of a context layer: it feeds agents, and it learns what they lack. Be honest that this is a small proof of concept: the records are files from each run, and a shared store would come with hosted endpoints. To show it, run python -m governance ask a couple of times with an unknown topic, then python -m governance demand on the log.</aside>
+</section>
