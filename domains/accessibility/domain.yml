@@ -1,0 +1,10 @@
+id: accessibility
+title: Digital accessibility (WCAG 2.2 AA)
+mode: advise
+owner: Accessibility Practice (PoC placeholder)
+contact: "#accessibility (placeholder)"
+knowledge_version: "2026.11.1"
+knowledge_url: https://github.com/Earlyflash/MCPGovenance/blob/main/domains/accessibility/knowledge/rules.yml
+waiver_route: >-
+  Advise-only domain: findings never block a merge. If you disagree with one, reply on the pull request and
+  tag the accessibility practice. Persistent disagreements are reviewed monthly and may change the guidance.

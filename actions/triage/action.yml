@@ -1,0 +1,56 @@
+name: Governance triage
+description: Work out which governance domains a pull request needs, from the changed paths and labels.
+
+inputs:
+  base:
+    description: Base commit SHA of the pull request.
+    required: true
+  head:
+    description: Head commit SHA of the pull request.
+    required: true
+  labels:
+    description: Comma-separated pull request labels.
+    default: ""
+  full-scan:
+    description: "'true' to judge every file instead of only what changed."
+    default: "false"
+
+outputs:
+  domains:
+    description: JSON array of domain ids that apply.
+    value: ${{ steps.triage.outputs.domains }}
+  applies:
+    description: "'true' when at least one domain applies."
+    value: ${{ steps.triage.outputs.applies }}
+
+runs:
+  using: composite
+  steps:
+    - name: Prepare toolchain
+      shell: bash
+      run: bash "${{ github.action_path }}/../../scripts/bootstrap.sh"
+
+    - name: Triage
+      id: triage
+      shell: bash
+      env:
+        GOV_BASE: ${{ inputs.base }}
+        GOV_HEAD: ${{ inputs.head }}
+        GOV_LABELS: ${{ inputs.labels }}
+        GOV_FULL: ${{ inputs.full-scan }}
+      run: |
+        args=(--repo "$GITHUB_WORKSPACE" --out "$RUNNER_TEMP/governance/triage.json" --labels "$GOV_LABELS")
+        if [ "$GOV_FULL" = "true" ]; then
+          args+=(--full-scan)
+        else
+          args+=(--base "$GOV_BASE" --head "$GOV_HEAD")
+        fi
+        "$GOV_PYTHON" -m governance triage "${args[@]}"
+
+    - name: Share triage result
+      uses: actions/upload-artifact@v4
+      with:
+        name: governance-triage
+        path: ${{ runner.temp }}/governance/triage.json
+        overwrite: true
+        retention-days: 7

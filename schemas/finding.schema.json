@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Earlyflash/MCPGovenance/schemas/finding.schema.json",
+  "title": "Governance finding",
+  "description": "The one contract every domain reviewer emits. Everything else about a domain may differ.",
+  "type": "object",
+  "required": [
+    "domain", "rule_id", "title", "severity", "message", "guidance_version",
+    "remediation", "owner", "waiver_route", "confidence", "check_type"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "domain": { "type": "string", "description": "Domain id, for example security." },
+    "rule_id": { "type": "string", "description": "Stable rule id from the domain's knowledge layer, for example SEC-001." },
+    "title": { "type": "string" },
+    "severity": { "enum": ["info", "warn", "block"], "description": "Severity declared by the rule. The governor applies the domain's mode on top (advise caps block at warn)." },
+    "message": { "type": "string", "description": "Why this matters, from the domain's guidance." },
+    "file": { "type": ["string", "null"] },
+    "line": { "type": ["integer", "null"], "minimum": 1 },
+    "evidence": { "type": "string", "description": "What was found. Secrets are redacted." },
+    "guidance_version": { "type": "string", "description": "Version of the domain knowledge the finding was explained from." },
+    "remediation": { "type": "string" },
+    "exemplar_good": { "type": "string", "description": "What good looks like, from the knowledge layer." },
+    "owner": { "type": "string", "description": "Team or role that owns the domain." },
+    "waiver_route": { "type": "string" },
+    "confidence": { "enum": ["high", "medium", "low"] },
+    "check_type": { "enum": ["deterministic", "agent"] }
+  }
+}

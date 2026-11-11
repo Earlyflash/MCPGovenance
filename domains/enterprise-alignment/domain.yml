@@ -1,0 +1,15 @@
+id: enterprise-alignment
+title: Enterprise technology alignment
+mode: evidence
+owner: Office of the CTO (PoC placeholder)
+contact: "#architecture (placeholder)"
+knowledge_version: "2026.11.1"
+knowledge_url: https://github.com/Earlyflash/MCPGovenance/blob/main/domains/enterprise-alignment/knowledge/rules.yml
+waiver_route: >-
+  Banned technology needs a waiver in .governance-waivers.yml approved by the Office of the CTO.
+  For anything else off the paved road, add an ADR under docs/adr/ that records the guidance consulted,
+  the deviation and any tension with strategy. This domain checks that the evidence exists, not that the
+  decision is right: people judge that.
+assessment_route: >-
+  Not in the technology catalogue. Do not assume it is permitted. Choose an adopted or approved option for the
+  same job, or open an assessment request with the Office of the CTO and link it from an ADR.

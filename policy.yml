@@ -1,0 +1,36 @@
+# The governor's brain. Lives in the governance repo, so a PR author cannot loosen the rules
+# that judge their own change. Domains declare their own mode (gate / advise / evidence) in
+# domains/<id>/domain.yml; this file decides where they run and how strictly the whole thing is enforced.
+version: 1
+
+enforcement:
+  mode: enforce          # enforce | warn-only (use warn-only while rolling out to a new repo)
+
+ignore_paths:
+  - "node_modules/**"
+  - "vendor/**"
+  - "**/dist/**"
+  - "package-lock.json"
+  - "*.lock"
+  - ".git/**"
+
+# Order findings appear in, and the order a human should settle disagreements in.
+precedence: [security, enterprise-alignment, accessibility]
+
+domains:
+  security:
+    required: true       # if this reviewer fails or does not report, the PR fails (fail closed)
+    paths: ["**"]        # secrets can appear in any file, so every change gets the security reviewer
+  enterprise-alignment:
+    required: true
+    paths: ["requirements*.txt", "pyproject.toml", "package.json", "Dockerfile*", "*.Dockerfile", "docs/adr/**"]
+  accessibility:
+    required: false      # advisory: a missing result is a warning, not a failure
+    paths: ["*.html", "*.htm"]
+    labels: ["a11y-review"]
+
+waivers:
+  file: .governance-waivers.yml
+  max_days: 90
+  require_approval: false   # PoC: single-person repos cannot self-approve. Set true once a second approver exists.
+  never_waivable: [SEC-001]

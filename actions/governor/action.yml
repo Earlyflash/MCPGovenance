@@ -1,0 +1,65 @@
+name: Governance governor
+description: Collate every domain's findings into one verdict, post one pull request comment, and pass or fail a single check.
+
+inputs:
+  github-token:
+    description: Token used to post the pull request comment (needs pull-requests write).
+    default: ${{ github.token }}
+  pr-number:
+    description: Pull request number.
+    required: true
+
+outputs:
+  verdict:
+    description: pass, pass-with-warnings or fail.
+    value: ${{ steps.govern.outputs.verdict }}
+
+runs:
+  using: composite
+  steps:
+    - name: Prepare toolchain
+      shell: bash
+      run: bash "${{ github.action_path }}/../../scripts/bootstrap.sh"
+
+    - name: Get triage result
+      uses: actions/download-artifact@v4
+      with:
+        name: governance-triage
+        path: ${{ runner.temp }}/governance
+
+    # No match is fine: it means no domain applied, or the reviewers crashed before uploading.
+    # The governor decides which, using the triage result.
+    - name: Get domain findings
+      continue-on-error: true
+      uses: actions/download-artifact@v4
+      with:
+        pattern: governance-findings-*
+        merge-multiple: true
+        path: ${{ runner.temp }}/governance
+
+    - name: Govern
+      id: govern
+      shell: bash
+      env:
+        GITHUB_TOKEN: ${{ inputs.github-token }}
+        GOV_PR: ${{ inputs.pr-number }}
+      run: |
+        "$GOV_PYTHON" -m governance govern \
+          --triage "$RUNNER_TEMP/governance/triage.json" \
+          --results "$RUNNER_TEMP/governance" \
+          --repo "$GITHUB_WORKSPACE" \
+          --out "$RUNNER_TEMP/governance" \
+          --pr "$GOV_PR" \
+          --post-comment
+
+    - name: Share verdict
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: governance-verdict
+        path: |
+          ${{ runner.temp }}/governance/verdict.json
+          ${{ runner.temp }}/governance/comment.md
+        if-no-files-found: ignore
+        overwrite: true
+        retention-days: 14

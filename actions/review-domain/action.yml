@@ -1,0 +1,44 @@
+name: Governance domain review
+description: Run one domain reviewer. It pulls its guidance from that domain's own MCP server and reports findings in the common schema.
+
+inputs:
+  domain:
+    description: Domain id, for example security.
+    required: true
+  full-scan:
+    description: "'true' to judge every file instead of only what changed."
+    default: "false"
+
+runs:
+  using: composite
+  steps:
+    - name: Prepare toolchain
+      shell: bash
+      run: bash "${{ github.action_path }}/../../scripts/bootstrap.sh"
+
+    - name: Get triage result
+      uses: actions/download-artifact@v4
+      with:
+        name: governance-triage
+        path: ${{ runner.temp }}/governance
+
+    - name: Review (${{ inputs.domain }})
+      shell: bash
+      env:
+        GOV_DOMAIN: ${{ inputs.domain }}
+        GOV_FULL: ${{ inputs.full-scan }}
+      run: |
+        args=(--domain "$GOV_DOMAIN" --repo "$GITHUB_WORKSPACE" --triage "$RUNNER_TEMP/governance/triage.json" --out "$RUNNER_TEMP/governance")
+        if [ "$GOV_FULL" = "true" ]; then args+=(--full-scan); fi
+        "$GOV_PYTHON" -m governance review "${args[@]}"
+
+    # Even when the reviewer crashed it writes an error result, which the governor turns into a failure.
+    - name: Share findings
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: governance-findings-${{ inputs.domain }}
+        path: ${{ runner.temp }}/governance/findings-${{ inputs.domain }}.json
+        if-no-files-found: ignore
+        overwrite: true
+        retention-days: 7

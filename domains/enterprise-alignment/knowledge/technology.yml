@@ -1,0 +1,155 @@
+# EXAMPLE technology catalogue for the PoC. Replace with your real technology radar.
+# status: adopt | approved | trial | tolerated | deprecated | banned
+# detection: the names the reviewer sees in manifests (pip, npm) or as image names (docker).
+technologies:
+  - id: python
+    name: Python
+    category: language-runtime
+    status: adopt
+    owner: Platform Engineering (placeholder)
+    last_reviewed_on: 2026-11-01
+    detection: { docker: [python] }
+
+  - id: node
+    name: Node.js
+    category: language-runtime
+    status: adopt
+    owner: Platform Engineering (placeholder)
+    last_reviewed_on: 2026-11-01
+    detection: { docker: [node] }
+
+  - id: flask
+    name: Flask
+    category: web-framework
+    status: adopt
+    owner: Platform Engineering (placeholder)
+    last_reviewed_on: 2026-11-01
+    detection: { pip: [flask] }
+
+  - id: fastapi
+    name: FastAPI
+    category: web-framework
+    status: approved
+    owner: Platform Engineering (placeholder)
+    last_reviewed_on: 2026-11-01
+    detection: { pip: [fastapi, uvicorn] }
+
+  - id: express
+    name: Express
+    category: web-framework
+    status: approved
+    owner: Platform Engineering (placeholder)
+    last_reviewed_on: 2026-11-01
+    detection: { npm: [express] }
+
+  - id: react
+    name: React
+    category: ui-framework
+    status: adopt
+    owner: Platform Engineering (placeholder)
+    last_reviewed_on: 2026-11-01
+    detection: { npm: [react, react-dom] }
+
+  - id: gunicorn
+    name: Gunicorn
+    category: app-server
+    status: approved
+    owner: Platform Engineering (placeholder)
+    last_reviewed_on: 2026-11-01
+    detection: { pip: [gunicorn] }
+
+  - id: requests
+    name: Requests
+    category: utility
+    status: approved
+    owner: Platform Engineering (placeholder)
+    last_reviewed_on: 2026-11-01
+    detection: { pip: [requests] }
+
+  - id: pyyaml
+    name: PyYAML
+    category: utility
+    status: approved
+    owner: Platform Engineering (placeholder)
+    last_reviewed_on: 2026-11-01
+    detection: { pip: [pyyaml] }
+
+  - id: pytest
+    name: pytest
+    category: test-tooling
+    status: adopt
+    owner: Platform Engineering (placeholder)
+    last_reviewed_on: 2026-11-01
+    detection: { pip: [pytest] }
+
+  - id: date-fns
+    name: date-fns
+    category: utility
+    status: adopt
+    owner: Platform Engineering (placeholder)
+    last_reviewed_on: 2026-11-01
+    detection: { npm: [date-fns] }
+
+  - id: postgresql
+    name: PostgreSQL
+    category: relational-database
+    status: adopt
+    owner: Data Platform (placeholder)
+    last_reviewed_on: 2026-11-01
+    detection: { docker: [postgres], pip: [psycopg, psycopg2, psycopg2-binary] }
+
+  - id: nginx
+    name: nginx
+    category: web-server
+    status: approved
+    owner: Platform Engineering (placeholder)
+    last_reviewed_on: 2026-11-01
+    detection: { docker: [nginx] }
+
+  - id: jquery
+    name: jQuery
+    category: ui-library
+    status: tolerated
+    conditions: Existing applications only; do not start new work with it.
+    owner: Platform Engineering (placeholder)
+    last_reviewed_on: 2026-11-01
+    detection: { npm: [jquery] }
+
+  - id: htmx
+    name: htmx
+    category: ui-library
+    status: trial
+    conditions: Internal tools only, while the trial runs.
+    owner: Platform Engineering (placeholder)
+    last_reviewed_on: 2026-11-01
+    detection: { npm: [htmx.org] }
+
+  - id: moment
+    name: Moment.js
+    category: utility
+    status: deprecated
+    reason: The project is in maintenance mode and is large for what it does
+    preferred_alternative: date-fns
+    owner: Platform Engineering (placeholder)
+    last_reviewed_on: 2026-11-01
+    detection: { npm: [moment] }
+
+  - id: nose
+    name: nose
+    category: test-tooling
+    status: deprecated
+    reason: Unmaintained and incompatible with current Python versions
+    preferred_alternative: pytest
+    owner: Platform Engineering (placeholder)
+    last_reviewed_on: 2026-11-01
+    detection: { pip: [nose] }
+
+  - id: event-stream
+    name: event-stream
+    category: utility
+    status: banned
+    reason: Subject of a known supply-chain compromise (EXAMPLE entry)
+    preferred_alternative: Node.js built-in streams
+    owner: Security Engineering (placeholder)
+    last_reviewed_on: 2026-11-01
+    detection: { npm: [event-stream, flatmap-stream] }

@@ -1,0 +1,11 @@
+id: security
+title: Application and infrastructure security
+mode: gate
+owner: Security Engineering (PoC placeholder)
+contact: "#security-help (placeholder)"
+knowledge_version: "2026.11.1"
+knowledge_url: https://github.com/Earlyflash/MCPGovenance/blob/main/domains/security/knowledge/rules.yml
+waiver_route: >-
+  Add an entry to .governance-waivers.yml (rule_id, optional path, reason, approver, expires within 90 days)
+  and have the security domain owner approve the pull request. SEC-001 (secrets) can never be waived:
+  remove the secret and rotate it.

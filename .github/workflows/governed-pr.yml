@@ -1,0 +1,82 @@
+name: Governed PR
+
+# Reusable workflow. A consuming repo calls it from a tiny workflow (see the README):
+#
+#   jobs:
+#     governed:
+#       uses: Earlyflash/MCPGovenance/.github/workflows/governed-pr.yml@main
+#
+# The caller must grant `contents: read` and `pull-requests: write`.
+# Make the check named "governed / governor" the one required check in a branch ruleset.
+
+on:
+  workflow_call:
+    inputs:
+      full-scan:
+        description: Judge every file, not only what the pull request changed.
+        type: boolean
+        default: false
+
+jobs:
+  triage:
+    name: triage
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      domains: ${{ steps.triage.outputs.domains }}
+      applies: ${{ steps.triage.outputs.applies }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - id: triage
+        uses: Earlyflash/MCPGovenance/actions/triage@main
+        with:
+          base: ${{ github.event.pull_request.base.sha }}
+          head: ${{ github.event.pull_request.head.sha }}
+          labels: ${{ join(github.event.pull_request.labels.*.name, ',') }}
+          full-scan: ${{ inputs.full-scan }}
+
+  review:
+    name: review (${{ matrix.domain }})
+    needs: triage
+    if: needs.triage.outputs.applies == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        domain: ${{ fromJSON(needs.triage.outputs.domains) }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: Earlyflash/MCPGovenance/actions/review-domain@main
+        with:
+          domain: ${{ matrix.domain }}
+          full-scan: ${{ inputs.full-scan }}
+
+  governor:
+    name: governor
+    needs: [triage, review]
+    # Run even if a reviewer failed or was skipped, so a crash is reported and fails closed.
+    if: ${{ !cancelled() }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - uses: Earlyflash/MCPGovenance/actions/governor@main
+        with:
+          github-token: ${{ github.token }}
+          pr-number: ${{ github.event.pull_request.number }}

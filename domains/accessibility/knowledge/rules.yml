@@ -1,0 +1,92 @@
+# Accessibility guidance. PoC content: replace with your organisation's real standards.
+# Severities are declared as if this domain gated merges; while the domain is in advise mode the
+# governor caps every block at warn. Flip `mode` in domain.yml to gate and the same rules block.
+rules:
+  - id: A11Y-001
+    title: Image without alternative text
+    severity: block
+    confidence: high
+    tags: [images, alt, text, wcag-1.1.1]
+    summary: An image has no alt attribute, so screen reader users get nothing (or the file name) in its place.
+    guidance: >-
+      Every img needs an alt attribute. Describe the purpose of informative images. Use alt="" for purely
+      decorative images so assistive technology skips them.
+    remediation: Add alt text that conveys the image's purpose, or alt="" if it is decorative.
+    exemplars:
+      bad: |
+        <img src="chart.png">
+      good: |
+        <img src="chart.png" alt="Quarterly sign-ups rose from 120 to 340">
+
+  - id: A11Y-002
+    title: Page language not set
+    severity: block
+    confidence: high
+    tags: [language, lang, html, wcag-3.1.1]
+    summary: Without a lang attribute on the html element screen readers may pronounce the page in the wrong language.
+    guidance: Set the primary language of every page on the html element.
+    remediation: Add lang to the html element, for example <html lang="en-GB">.
+    exemplars:
+      bad: |
+        <html>
+      good: |
+        <html lang="en-GB">
+
+  - id: A11Y-003
+    title: Form control without a label
+    severity: block
+    confidence: medium
+    tags: [forms, label, input, wcag-1.3.1, wcag-3.3.2]
+    summary: An input, select or textarea has no programmatic label, so assistive technology cannot tell users what to enter.
+    guidance: >-
+      Every form control needs a visible label associated with it (label for/id, or wrapping the control).
+      Use aria-label only when a visible label is not possible.
+    remediation: Associate a visible <label> with the control using for and id.
+    exemplars:
+      bad: |
+        <input type="email" name="email">
+      good: |
+        <label for="email">Email address</label>
+        <input id="email" type="email" name="email" autocomplete="email">
+
+  - id: A11Y-004
+    title: Link text does not describe its destination
+    severity: warn
+    confidence: medium
+    tags: [links, text, navigation, wcag-2.4.4]
+    summary: Link text such as "click here" or "read more" is meaningless when links are read out of context.
+    guidance: Link text should make sense on its own and describe where the link goes.
+    remediation: Rewrite the link text to describe the destination.
+    exemplars:
+      bad: |
+        <a href="/pricing">click here</a>
+      good: |
+        <a href="/pricing">See pricing plans</a>
+
+  - id: A11Y-005
+    title: Page has no title
+    severity: warn
+    confidence: high
+    tags: [title, page, wcag-2.4.2]
+    summary: A page without a title gives screen reader users and tab bars nothing to identify it by.
+    guidance: Every page needs a short, unique, descriptive title element.
+    remediation: Add a descriptive <title> inside <head>.
+    exemplars:
+      bad: |
+        <head></head>
+      good: |
+        <head><title>Pricing plans - Example</title></head>
+
+  - id: A11Y-006
+    title: Button without an accessible name
+    severity: block
+    confidence: medium
+    tags: [button, name, icon, wcag-4.1.2]
+    summary: A button with no text and no aria-label is announced as just "button".
+    guidance: Give every button visible text, or an aria-label when it only contains an icon.
+    remediation: Add visible text or an aria-label that says what the button does.
+    exemplars:
+      bad: |
+        <button><svg>...</svg></button>
+      good: |
+        <button aria-label="Close dialog"><svg aria-hidden="true">...</svg></button>

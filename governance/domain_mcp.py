@@ -1,0 +1,151 @@
+"""The knowledge layer: one small MCP server per domain, all with the same tool contract.
+
+Contract (every domain):
+  get_domain_info()            -> id, title, mode, owner, contact, guidance_version, knowledge_url
+  list_rules(severity?)        -> every rule with id, title, severity, summary, tags
+  get_guidance(query)          -> the rule(s) matching an id or free-text topic: guidance + remediation
+  get_exemplars(rule_id)       -> a "bad" and a "good" example
+  get_deviation_route()        -> how to request a waiver, who owns the domain
+
+A domain's knowledge is plain YAML in ``domains/<id>/knowledge`` so its owners can change it with an
+ordinary pull request. Domains may register extra tools (see enterprise-alignment).
+
+Tools return JSON text so every MCP client can use them. Stdout belongs to the protocol: never print.
+"""
+
+from __future__ import annotations
+
+import hashlib
+import json
+import re
+from pathlib import Path
+from typing import Any
+
+import yaml
+from mcp.server.fastmcp import FastMCP
+
+
+class Knowledge:
+    def __init__(self, domain_dir: Path):
+        self.dir = Path(domain_dir)
+        self.info: dict[str, Any] = yaml.safe_load((self.dir / "domain.yml").read_text(encoding="utf-8"))
+        rules_doc = yaml.safe_load((self.dir / "knowledge" / "rules.yml").read_text(encoding="utf-8"))
+        self.rules: list[dict[str, Any]] = rules_doc["rules"]
+        self.version = self._version()
+
+    def _version(self) -> str:
+        h = hashlib.sha256()
+        files = [self.dir / "domain.yml", *sorted((self.dir / "knowledge").rglob("*"))]
+        for p in files:
+            if p.is_file():
+                h.update(p.relative_to(self.dir).as_posix().encode())
+                h.update(p.read_bytes())
+        return f"{self.info.get('knowledge_version', '0')}+{h.hexdigest()[:8]}"
+
+    def domain_info(self) -> dict[str, Any]:
+        i = self.info
+        return {
+            "id": i["id"],
+            "title": i["title"],
+            "mode": i["mode"],
+            "owner": i["owner"],
+            "contact": i.get("contact", ""),
+            "guidance_version": self.version,
+            "knowledge_url": i.get("knowledge_url", ""),
+            "rule_count": len(self.rules),
+        }
+
+    def rule(self, rule_id: str) -> dict[str, Any] | None:
+        for r in self.rules:
+            if r["id"].lower() == rule_id.strip().lower():
+                return r
+        return None
+
+    def search(self, query: str, limit: int = 3) -> list[dict[str, Any]]:
+        exact = self.rule(query)
+        if exact:
+            return [exact]
+        terms = [t for t in re.findall(r"[a-z0-9]+", query.lower()) if len(t) > 2]
+        scored: list[tuple[int, dict[str, Any]]] = []
+        for r in self.rules:
+            hay = " ".join([r["id"], r["title"], r.get("summary", ""), " ".join(r.get("tags", []))]).lower()
+            score = sum(1 for t in terms if t in hay)
+            if score:
+                scored.append((score, r))
+        scored.sort(key=lambda x: -x[0])
+        return [r for _, r in scored[:limit]]
+
+
+def _j(obj: Any) -> str:
+    return json.dumps(obj, ensure_ascii=False)
+
+
+def build_server(domain_dir: Path) -> tuple[FastMCP, Knowledge]:
+    k = Knowledge(domain_dir)
+    mcp = FastMCP(f"{k.info['id']}-guidance", log_level="WARNING")
+
+    @mcp.tool()
+    def get_domain_info() -> str:
+        """Describe this governance domain: owner, mode (gate, advise or evidence), and the current
+        guidance_version. Call first to see who owns the guidance and how strictly it is enforced."""
+        return _j(k.domain_info())
+
+    @mcp.tool()
+    def list_rules(severity: str | None = None) -> str:
+        """List every rule in this domain (id, title, severity, summary, tags). Optionally filter by
+        severity: block, warn or info."""
+        rules = [
+            {key: r.get(key) for key in ("id", "title", "severity", "summary", "tags", "confidence")}
+            for r in k.rules
+            if severity is None or r["severity"] == severity
+        ]
+        return _j(rules)
+
+    @mcp.tool()
+    def get_guidance(query: str) -> str:
+        """Get the guidance for a rule id (for example SEC-001) or a free-text topic. Returns the rule,
+        why it exists, how to fix a violation, and the guidance_version the answer came from. Call this
+        BEFORE designing or changing something this domain governs."""
+        matches = k.search(query)
+        return _j(
+            {
+                "query": query,
+                "guidance_version": k.version,
+                "owner": k.info["owner"],
+                "matches": [
+                    {
+                        "id": r["id"],
+                        "title": r["title"],
+                        "severity": r["severity"],
+                        "summary": r.get("summary", ""),
+                        "guidance": r.get("guidance", ""),
+                        "remediation": r.get("remediation", ""),
+                        "tags": r.get("tags", []),
+                    }
+                    for r in matches
+                ],
+            }
+        )
+
+    @mcp.tool()
+    def get_exemplars(rule_id: str) -> str:
+        """Show what bad and good look like for a rule, so the fix follows the organisation's pattern."""
+        r = k.rule(rule_id)
+        if not r:
+            return _j({"error": "not_found", "rule_id": rule_id})
+        ex = r.get("exemplars", {})
+        return _j({"rule_id": r["id"], "bad": ex.get("bad", ""), "good": ex.get("good", ""), "guidance_version": k.version})
+
+    @mcp.tool()
+    def get_deviation_route() -> str:
+        """How to request a waiver or deviation in this domain, and who decides."""
+        return _j(
+            {
+                "waiver_route": k.info.get("waiver_route", ""),
+                "owner": k.info["owner"],
+                "contact": k.info.get("contact", ""),
+                "guidance_version": k.version,
+            }
+        )
+
+    return mcp, k
