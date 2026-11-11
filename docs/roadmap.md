@@ -20,7 +20,7 @@ These are what make the current design trustworthy. An idea that breaks one of t
 | Horizon | Theme | Ideas |
 | --- | --- | --- |
 | **Foundations** (make what exists trustworthy at scale) | Control and safety | A1 Shadow rules · A2 Base-branch waivers and a waiver register · A3 Rule impact preview · A4 Org-wide required check |
-| **Next** (high value once foundations exist) | Knowledge and visibility | B1 Remote domain endpoints · B2 Policy-to-rules drafting · B3 Estate dashboard · B4 Agent pre-flight · B5 Fix suggestions |
+| **Next** (high value once foundations exist) | Knowledge and visibility | B1 Remote domain endpoints · B2 Policy-to-rules drafting · B3 Estate dashboard · B4 Agent pre-flight · B5 Fix suggestions · B6 Demand layer |
 | **Later** (strategic bets) | Reach and intelligence | C1 Judgment reviewers · C2 Strategy alignment · C3 Risk tiers alongside stages · C4 Beyond the PR · C5 New domains |
 | **Always** | Quality of the system itself | D1 Rule quality scores · D2 Release rings for guidance · D3 Audit trail |
 
@@ -113,6 +113,23 @@ guidance as context.
 **Needs:** safe, tested patch generators per rule; a policy on who may apply them.
 **Working when:** a large share of findings are closed by accepting a suggestion.
 
+### B6. Demand layer
+**What:** record what people and agents ask the knowledge layer for, and turn it into a ranked backlog. Each tool
+call becomes one small record: the area, the question (a rule id, a topic or a technology name), who asked (a team
+or agent label), the repo and stage, and whether the server had an answer. Never file contents. A report ranks
+three things: questions with **no answer** (gaps in the guidance), the guidance looked up most (often unclear), and
+the rules waived most (often wrong or too early for their stage).
+**Why:** every question is a statement of need, and today it goes unrecorded. This tells each governance team what
+to write next, and tells the Office of the CTO where to invest first, using evidence instead of opinion. It also
+shows which products are asking for guardrails that do not exist yet.
+**Needs:** a place for the records to land. The proof of concept writes them as files from each CI run (see
+`python -m governance demand`); at scale this is a small store behind the hosted endpoints of B1. Agree early what
+is and is not recorded, and report at team or repo level, never per person.
+**Working when:** the top unanswered questions each month become new guidance within a short, agreed time, and the
+count of unanswered questions per area falls.
+**In the proof of concept:** set `GOVERNANCE_DEMAND_LOG` and every domain server records its calls;
+`python -m governance ask` plays the part of an agent; `python -m governance demand <logs>` prints the report.
+
 ---
 
 ## Later
@@ -192,7 +209,7 @@ If you do only a few, this order has the best value for effort and removes the m
 1. **A1 Shadow rules** and **A3 Rule impact preview**: make changing rules safe.
 2. **A4 Organisation-wide required check** with **A2 waiver register**: make governance the default and controllable.
 3. **B3 Estate dashboard**: make it visible to leadership and teams.
-4. **B1 Remote endpoints** then **B4 Agent pre-flight**: the original goal of informed agents.
+4. **B1 Remote endpoints** then **B4 Agent pre-flight**: the original goal of informed agents. **B6 Demand layer** comes with them, because their questions are the demand.
 5. **B2 Policy-to-rules drafting** to keep policy and rules in step as the system grows.
 6. **C1 Judgment reviewers** once the earlier pieces provide the measurement to trust them.
 

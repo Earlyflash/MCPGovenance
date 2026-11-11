@@ -4,6 +4,7 @@ reviewer job; production would point at a remote streamable-HTTP endpoint instea
 from __future__ import annotations
 
 import json
+import os
 import sys
 from contextlib import asynccontextmanager
 from pathlib import Path
@@ -35,15 +36,23 @@ class DomainClient:
         return [t.name for t in (await self._session.list_tools()).tools]
 
 
+def _demand_env(caller: str | None) -> dict[str, str]:
+    """Pass the demand-log settings through to the server process (it starts with a clean environment)."""
+    env = {k: os.environ[k] for k in ("GOVERNANCE_DEMAND_LOG", "GOVERNANCE_CALLER", "GOVERNANCE_REPO", "GOVERNANCE_STAGE") if k in os.environ}
+    if caller:
+        env["GOVERNANCE_CALLER"] = caller
+    return env
+
+
 @asynccontextmanager
-async def open_domain(domain_id: str, root: Path) -> AsyncIterator[DomainClient]:
+async def open_domain(domain_id: str, root: Path, caller: str | None = None) -> AsyncIterator[DomainClient]:
     server = Path(root) / "domains" / domain_id / "mcp_server.py"
     if not server.is_file():
         raise FileNotFoundError(f"no MCP server for domain '{domain_id}' at {server}")
     params = StdioServerParameters(
         command=sys.executable,
         args=[str(server)],
-        env={"PYTHONPATH": str(Path(root))},
+        env={"PYTHONPATH": str(Path(root)), **_demand_env(caller)},
     )
     async with stdio_client(params) as (read, write):
         async with ClientSession(read, write) as session:

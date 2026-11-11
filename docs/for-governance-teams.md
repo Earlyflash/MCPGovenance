@@ -207,6 +207,7 @@ checks that the security policy page has the heading each rule links to.
 | Find a rule's source | The 📘 policy and 📖 rule definition links on each finding |
 | Add or change a rule, add a new area | [extending.md](extending.md) |
 | Understand the design | [how-it-works.md](how-it-works.md) |
+| See what people and agents ask for, and what we cannot answer | Run `python -m governance demand <logs>` on the `demand-*.jsonl` files uploaded by each run (set `GOVERNANCE_DEMAND_LOG` to record). The top unanswered questions are your backlog. See roadmap B6 |
 | Review waivers across the organisation | Search repos for `.governance-waivers.yml`; expiry dates are in each file |
 
 ## Setup checklist (before relying on it)

@@ -27,6 +27,9 @@ runs:
       env:
         GOV_DOMAIN: ${{ inputs.domain }}
         GOV_FULL: ${{ inputs.full-scan }}
+        # Record what is asked of the knowledge layer (see docs/roadmap.md, B6). No file contents are recorded.
+        GOVERNANCE_DEMAND_LOG: ${{ runner.temp }}/governance/demand-${{ inputs.domain }}.jsonl
+        GOVERNANCE_REPO: ${{ github.repository }}
       run: |
         args=(--domain "$GOV_DOMAIN" --repo "$GITHUB_WORKSPACE" --triage "$RUNNER_TEMP/governance/triage.json" --out "$RUNNER_TEMP/governance")
         if [ "$GOV_FULL" = "true" ]; then args+=(--full-scan); fi
@@ -38,7 +41,9 @@ runs:
       uses: actions/upload-artifact@v4
       with:
         name: governance-findings-${{ inputs.domain }}
-        path: ${{ runner.temp }}/governance/findings-${{ inputs.domain }}.json
+        path: |
+          ${{ runner.temp }}/governance/findings-${{ inputs.domain }}.json
+          ${{ runner.temp }}/governance/demand-${{ inputs.domain }}.jsonl
         if-no-files-found: ignore
         overwrite: true
         retention-days: 7

@@ -118,6 +118,32 @@ def cmd_docs(a: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_ask(a: argparse.Namespace) -> int:
+    """Ask a domain's knowledge layer a question the way an agent would. The call is recorded as demand."""
+    import asyncio
+    from .mcp_client import open_domain
+
+    async def go() -> Any:
+        async with open_domain(a.domain, ROOT, caller=a.caller) as mcp:
+            if a.technology:
+                return await mcp.call("check_technology", name=a.question, ecosystem=a.ecosystem or None)
+            return await mcp.call("get_guidance", query=a.question)
+
+    print(json.dumps(asyncio.run(go()), indent=2))
+    return 0
+
+
+def cmd_demand(a: argparse.Namespace) -> int:
+    from . import demand
+    rows = demand.load([Path(p) for p in a.logs])
+    summary = demand.summarise(rows, a.top)
+    text = json.dumps(summary, indent=2) if a.json else demand.render(summary)
+    print(text)
+    if a.out:
+        Path(a.out).write_text(demand.render(summary), encoding="utf-8")
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(prog="governance")
     sub = p.add_subparsers(dest="cmd", required=True)
@@ -167,6 +193,21 @@ def main(argv: list[str] | None = None) -> int:
     d = sub.add_parser("docs", help="regenerate the guardrail documentation from the rules")
     d.add_argument("--check", action="store_true", help="fail if the generated pages are out of date")
     d.set_defaults(fn=cmd_docs)
+
+    q = sub.add_parser("ask", help="ask a domain's guidance a question, as an agent would (recorded as demand when GOVERNANCE_DEMAND_LOG is set)")
+    q.add_argument("--domain", required=True)
+    q.add_argument("--caller", default="cli", help="label for who is asking, for example copilot or a team name")
+    q.add_argument("--technology", action="store_true", help="ask whether a technology is approved (enterprise-alignment)")
+    q.add_argument("--ecosystem", default="", help="pip, npm or docker (with --technology)")
+    q.add_argument("question")
+    q.set_defaults(fn=cmd_ask)
+
+    dm = sub.add_parser("demand", help="report what has been asked of the knowledge layer, and what had no answer")
+    dm.add_argument("logs", nargs="+", help="demand*.jsonl files or folders containing them")
+    dm.add_argument("--top", type=int, default=10)
+    dm.add_argument("--json", action="store_true")
+    dm.add_argument("--out", help="also write the markdown report here")
+    dm.set_defaults(fn=cmd_demand)
 
     a = p.parse_args(argv)
     return a.fn(a)

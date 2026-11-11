@@ -15,7 +15,9 @@ Tools return JSON text so every MCP client can use them. Stdout belongs to the p
 
 from __future__ import annotations
 
+import functools
 import hashlib
+import inspect
 import json
 import re
 from pathlib import Path
@@ -23,6 +25,7 @@ from typing import Any
 
 import yaml
 
+from . import demand
 from .stages import STAGES, applies, parse as parse_stage, severity_at, severity_by_stage
 from mcp.server.mcpserver import MCPServer
 
@@ -114,6 +117,26 @@ def _j(obj: Any) -> str:
 def build_server(domain_dir: Path) -> tuple[MCPServer, Knowledge]:
     k = Knowledge(domain_dir)
     mcp = MCPServer(f"{k.info['id']}-guidance", log_level="WARNING")
+    _register = mcp.tool
+
+    def tool(*a: Any, **kw: Any):
+        """Register a tool and record each call in the demand log (a no-op unless GOVERNANCE_DEMAND_LOG is set)."""
+        decorate = _register(*a, **kw)
+
+        def apply(fn):
+            sig = inspect.signature(fn)
+
+            @functools.wraps(fn)
+            def logged(*args: Any, **kwargs: Any):
+                out = fn(*args, **kwargs)
+                demand.record(k.info["id"], fn.__name__, dict(sig.bind(*args, **kwargs).arguments), out)
+                return out
+
+            return decorate(logged)
+
+        return apply
+
+    mcp.tool = tool  # type: ignore[method-assign]
 
     @mcp.tool()
     def get_domain_info() -> str:

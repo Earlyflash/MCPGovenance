@@ -38,7 +38,7 @@ def annotate(finding: Finding, mode: str, stage: str = "production") -> str:
 async def review_domain(domain_id: str, root: Path, repo: Path, triage_data: dict[str, Any], full: bool = False) -> DomainResult:
     files = files_from_triage(triage_data)
     module = importlib.import_module(f"governance.reviewers.{domain_id.replace('-', '_')}")
-    async with open_domain(domain_id, root) as mcp:
+    async with open_domain(domain_id, root, caller="reviewer") as mcp:
         info = await mcp.call("get_domain_info")
         rules = {r["id"]: r for r in await mcp.call("list_rules")}
         route = await mcp.call("get_deviation_route")
