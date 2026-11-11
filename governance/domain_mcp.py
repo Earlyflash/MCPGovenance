@@ -57,6 +57,7 @@ class Knowledge:
             "contact": i.get("contact", ""),
             "guidance_version": self.version,
             "knowledge_url": i.get("knowledge_url", ""),
+            "policy_url": i.get("policy_url", ""),
             "rule_count": len(self.rules),
         }
 
@@ -65,6 +66,18 @@ class Knowledge:
         base = self.info.get("knowledge_url", "")
         line = self._lines.get(rule_id.upper())
         return f"{base}#L{line}" if base and line else base
+
+    def policy_url(self, rule_id: str) -> str:
+        """Link to the human-readable policy for this rule (rule-specific if set, else its section on the domain page)."""
+        r = self.rule(rule_id) or {}
+        if r.get("policy_url"):
+            return r["policy_url"]
+        base = self.info.get("policy_url", "")
+        if not base:
+            return ""
+        heading = f"{r.get('id', rule_id)} {r.get('title', '')}".lower()
+        anchor = re.sub(r"[^a-z0-9 \-_]", "", heading).replace(" ", "-")
+        return f"{base}#{anchor}" if r else base
 
     def rule(self, rule_id: str) -> dict[str, Any] | None:
         for r in self.rules:
@@ -133,6 +146,7 @@ def build_server(domain_dir: Path) -> tuple[MCPServer, Knowledge]:
                         "remediation": r.get("remediation", ""),
                         "tags": r.get("tags", []),
                         "guidance_url": k.guidance_url(r["id"]),
+                        "policy_url": k.policy_url(r["id"]),
                     }
                     for r in matches
                 ],

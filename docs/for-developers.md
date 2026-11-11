@@ -25,7 +25,7 @@ The comment updates itself when you push. It does not add a new one each time.
 Found:         requests.get(url, verify=False)
 Why it matters: ...
 How to fix:    ...
-📖 Guidance:   SEC-003 in the security guidance   ← the full rule
+📘 Read the policy · 📖 Rule definition   ← the policy as people read it, and the exact rule
 What good looks like  ▸ (expand for an example)
 ```
 
@@ -34,7 +34,8 @@ What good looks like  ▸ (expand for an example)
 | Severity | ⛔ blocks the merge, ⚠️ advises, ℹ️ informs |
 | Rule id | Stable name, for example `SEC-003`. Quote it when asking for help |
 | 📍 location | File and line you changed |
-| Guidance link | The rule as the owning team wrote it |
+| 📘 Policy link | The human-readable policy for this rule. Start here |
+| 📖 Rule definition | The rule as coded, for engineers |
 | Owner and contact | Who to ask. Shown under each domain heading |
 
 Only the lines **your PR added or changed** are judged. Old code is not held against you.
@@ -49,7 +50,7 @@ The foot of the comment lists areas that did not apply.
 
 1. Read **How to fix** and the example under **What good looks like**.
 2. Make the change and push. The comment refreshes.
-3. If it is not clear, open the 📖 guidance link or contact the owner shown for that domain.
+3. If it is not clear, open the 📘 policy link or contact the owner shown for that domain.
 
 ### Using Copilot or another AI agent
 
@@ -93,7 +94,7 @@ Then:
 1. The governance team is asked to review the waiver file (it is protected by code owners). Explain why in the PR.
 2. When they approve and you merge, the waiver applies to that rule and path until it expires. You do not need a
    fresh approval for each PR in that time.
-3. It is shown in every PR comment under **Waived** so it stays visible.
+3. It is shown in every PR comment under **Waived** so it stays visible. In your own PR it is marked ⏳ *New in this PR* until it is merged; after that it shows ✅.
 4. When it expires the finding returns. Either fix the underlying issue or request a new waiver.
 
 Rules about waivers:
@@ -106,7 +107,7 @@ Rules about waivers:
 
 ## Frequently asked questions
 
-**It blocked my PR but I think the rule is wrong.** Open the guidance link and contact the owner shown. If the
+**It blocked my PR but I think the rule is wrong.** Open the policy link and contact the owner shown. If the
 rule is wrong, the fix is a change to the rule (a pull request to the governance repo), which benefits everyone. A
 waiver is for your one case.
 

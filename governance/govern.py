@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import datetime as dt
 import json
+import subprocess
 from pathlib import Path
 from typing import Any
 
@@ -24,6 +25,26 @@ def load_waivers(path: Path | None) -> list[dict[str, Any]]:
     doc = yaml.safe_load(Path(path).read_text(encoding="utf-8")) or {}
     items = doc.get("waivers") or []
     return [w for w in items if isinstance(w, dict)]
+
+
+def _norm(w: dict[str, Any]) -> tuple[str, ...]:
+    return tuple(str(w.get(k, "")).strip() for k in ("rule_id", "path", "reason", "approver", "expires"))
+
+
+def _same_waiver(w: dict[str, Any], base: list[dict[str, Any]]) -> bool:
+    """True if this exact waiver already existed on the base branch (so a code owner has already accepted it)."""
+    return any(_norm(w) == _norm(b) for b in base)
+
+
+def load_waivers_at(repo: Path, base: str | None, rel: str) -> list[dict[str, Any]] | None:
+    """The waivers file as it was on the base commit; None if the base is unknown, [] if it did not exist there."""
+    if not base:
+        return None
+    res = subprocess.run(["git", "show", f"{base}:{rel}"], cwd=repo, capture_output=True, text=True, check=False)
+    if res.returncode != 0:
+        return []
+    doc = yaml.safe_load(res.stdout) or {}
+    return [w for w in (doc.get("waivers") or []) if isinstance(w, dict)]
 
 
 def _to_date(value: Any) -> dt.date | None:
@@ -73,6 +94,7 @@ def govern(
     waivers: list[dict[str, Any]] | None = None,
     approvals: set[str] | None = None,
     today: dt.date | None = None,
+    base_waivers: list[dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     today = today or dt.date.today()
     expected: list[str] = triage.get("domains", [])
@@ -85,7 +107,7 @@ def govern(
         required = (policy["domains"].get(d) or {}).get("required", True)
         path = Path(results_dir) / f"findings-{d}.json"
         row = {"domain": d, "mode": "unknown", "owner": "unknown", "guidance_version": "unknown", "status": "missing", "waiver_route": "",
-               "title": d, "contact": "", "knowledge_url": "", "files_considered": None}
+               "title": d, "contact": "", "knowledge_url": "", "policy_url": "", "files_considered": None}
         if not path.is_file():
             findings.append(_synthetic(d, "GOV-001", "Reviewer did not report",
                                        f"The {d} reviewer produced no result, so this domain could not be checked.",
@@ -93,7 +115,7 @@ def govern(
         else:
             res = json.loads(path.read_text(encoding="utf-8"))
             row.update(mode=res["mode"], owner=res["owner"], guidance_version=res["guidance_version"], status=res["status"],
-                       title=res.get("title") or d, contact=res.get("contact", ""), knowledge_url=res.get("knowledge_url", ""),
+                       title=res.get("title") or d, contact=res.get("contact", ""), knowledge_url=res.get("knowledge_url", ""), policy_url=res.get("policy_url", ""),
                        files_considered=(res.get("stats") or {}).get("files_considered"))
             if res["status"] != "ok":
                 findings.append(_synthetic(d, "GOV-002", "Reviewer failed", f"The {d} reviewer failed: {res.get('error', 'unknown error')}",
@@ -124,7 +146,8 @@ def govern(
         for w in valid:
             if str(w["rule_id"]).upper() == f["rule_id"].upper() and match(f.get("file") or "", w.get("path", "**")):
                 f["waived"] = True
-                f["waiver"] = {"reason": w["reason"], "approver": w["approver"], "expires": str(_to_date(w["expires"]))}
+                f["waiver"] = {"reason": w["reason"], "approver": w["approver"], "expires": str(_to_date(w["expires"])),
+                               "new_in_pr": base_waivers is not None and not _same_waiver(w, base_waivers)}
                 break
 
     active = [f for f in findings if not f["waived"]]

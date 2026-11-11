@@ -10,7 +10,7 @@ from pathlib import Path
 from typing import Any
 
 from . import github_api
-from .govern import govern, load_waivers
+from .govern import govern, load_waivers, load_waivers_at
 from .policy import load_policy
 from .render import MARKER, render_comment
 from .review import run_and_write
@@ -60,7 +60,8 @@ def _govern(a_policy: str, triage_path: Path, results: Path, repo: Path, out: Pa
             approvals = github_api.approvers(slug, pr, token)
         except github_api.GitHubError as exc:
             print(f"warning: could not read PR approvals: {exc}", file=sys.stderr)
-    verdict = govern(policy, triage_data, results, waivers, approvals, today)
+    base_waivers = None if triage_data.get("full_scan") else load_waivers_at(repo, triage_data.get("base"), policy["waivers"]["file"])
+    verdict = govern(policy, triage_data, results, waivers, approvals, today, base_waivers)
     server, run_id = os.environ.get("GITHUB_SERVER_URL", "https://github.com"), os.environ.get("GITHUB_RUN_ID")
     run_url = f"{server}/{slug}/actions/runs/{run_id}" if slug and run_id else ""
     comment = render_comment(verdict, {"run_url": run_url, "head": (triage_data.get("head") or "")[:7]})

@@ -195,3 +195,24 @@ def test_every_finding_links_to_its_guidance(tmp_path):
     assert f["guidance_url"].endswith("security/knowledge/rules.yml#L" + f["guidance_url"].rsplit("#L", 1)[1])
     assert "#L" in f["guidance_url"]
     assert f"({f['guidance_url']})" in render_comment(v)
+
+
+def test_findings_link_to_the_human_readable_policy(tmp_path):
+    repo, b, h = make_pr(tmp_path, {}, {"app.py": 'requests.get(u, verify=False)\n'})
+    v = pipeline(repo, b, h, tmp_path / "out")
+    url = v["findings"][0]["policy_url"]
+    assert url.endswith("docs/policy/security.md#sec-003-tls-certificate-verification-disabled")
+    assert f"({url})" in render_comment(v)
+    policy_page = (ROOT / "docs" / "policy" / "security.md").read_text()
+    assert "## SEC-003 TLS certificate verification disabled" in policy_page
+
+
+def test_new_waivers_are_flagged_until_they_exist_on_the_base_branch(tmp_path):
+    pol, tri = policy(), triage("security")
+    res = tmp_path / "r2"
+    res.mkdir()
+    result(res, "security", "gate", [finding(rule="SEC-002", severity="warn", file="scripts/x.py")])
+    new = govern(pol, tri, res, [waiver(path="scripts/**")], None, TODAY, base_waivers=[])
+    assert new["findings"][0]["waiver"]["new_in_pr"] is True and "New in this PR" in render_comment(new)
+    old = govern(pol, tri, res, [waiver(path="scripts/**")], None, TODAY, base_waivers=[waiver(path="scripts/**")])
+    assert old["findings"][0]["waiver"]["new_in_pr"] is False and "New in this PR" not in render_comment(old)

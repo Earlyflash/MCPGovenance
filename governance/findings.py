@@ -28,6 +28,7 @@ class Finding:
     confidence: str = "medium"  # high | medium | low
     check_type: str = "deterministic"  # deterministic | agent
     guidance_url: str = ""  # link to this rule in the domain's guidance
+    policy_url: str = ""  # link to the human-readable policy for this rule
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
@@ -46,6 +47,7 @@ class DomainResult:
     title: str = ""
     contact: str = ""
     knowledge_url: str = ""
+    policy_url: str = ""
 
     def to_dict(self) -> dict[str, Any]:
         d = asdict(self)

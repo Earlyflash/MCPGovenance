@@ -4,6 +4,7 @@ mode: evidence
 owner: Office of the CTO (PoC placeholder)
 contact: "#architecture (placeholder)"
 knowledge_version: "2026.11.1"
+policy_url: https://github.com/Earlyflash/MCPGovenance/blob/main/docs/policy/enterprise-alignment.md
 knowledge_url: https://github.com/Earlyflash/MCPGovenance/blob/main/domains/enterprise-alignment/knowledge/rules.yml
 waiver_route: >-
   Banned technology needs a waiver in .governance-waivers.yml approved by the Office of the CTO.

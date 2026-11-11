@@ -1,0 +1,11 @@
+# Who must approve changes here. PoC: one person owns everything. In a real deployment replace @Earlyflash with
+# each governance team (for example @your-org/security-governance). Combine with a branch ruleset that requires
+# code owner review, otherwise this file only requests reviews.
+*                               @Earlyflash
+/policy.yml                     @Earlyflash
+/domains/security/              @Earlyflash
+/domains/accessibility/         @Earlyflash
+/domains/enterprise-alignment/  @Earlyflash
+/docs/policy/                   @Earlyflash
+/governance/                    @Earlyflash
+/.github/                       @Earlyflash

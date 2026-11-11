@@ -27,6 +27,7 @@ explains how your policy becomes something every pull request is checked against
 
 | You own | Where | Changes by |
 | --- | --- | --- |
+| The human-readable policy | `docs/policy/<area>.md` (or the docs site) | Pull request |
 | Rule wording, fix advice, examples, severity | `domains/<area>/knowledge/rules.yml` | Pull request |
 | How strict the area is (`gate`, `advise`, `evidence`), owner, contact, how to ask for a waiver | `domains/<area>/domain.yml` | Pull request |
 | Checks that find violations | `governance/reviewers/<area>.py` | Pull request |
@@ -75,8 +76,9 @@ sure `CODEOWNERS` lists your team against your area's folder, and the branch rul
 /policy.yml                     @your-org/platform-governance
 ```
 
-> **Current state:** the PoC does not have a CODEOWNERS file or a branch ruleset yet. Until both exist, approval is
-> by convention only. Set them up before relying on it.
+> **Current state:** `.github/CODEOWNERS` exists in this repo, with the PoC owner as a placeholder for every
+> area. A branch ruleset that makes code owner review **required** has not been created, so today CODEOWNERS only
+> requests a review. Create the ruleset and replace the placeholder with real teams before relying on it.
 
 When reviewing a change, check:
 - Does the wording say what you mean, and would a developer know what to do?
@@ -131,15 +133,29 @@ Understand what a waiver covers, because approval is given once:
 - Any later change to the waiver file (adding, widening or extending) needs approval again, because it is a change
   to a CODEOWNERS-protected file.
 
-> **Current state:** the demo app does not yet have a CODEOWNERS file, and `waivers.require_approval` is `false`
-> in `policy.yml` because the PoC repos have a single person. With `require_approval: true`, the named `approver`
-> must also have approved the pull request, which stops people naming someone who never saw it. Turn it on once a
-> second person exists.
+> **Current state:** the demo app has a CODEOWNERS entry for `.governance-waivers.yml` (placeholder owner), but
+> no ruleset requiring code owner review yet, and `waivers.require_approval` is `false` in `policy.yml` because the
+> PoC repos have a single person. With `require_approval: true`, the named `approver` must also have approved the
+> pull request, which stops people naming someone who never saw it. Turn it on once a second person exists.
 
-> **Known gap:** the governor reads `.governance-waivers.yml` from the pull request's own code, so a waiver added
-> in a PR counts for that PR's check straight away. The control that stops an unapproved waiver is CODEOWNERS plus
-> required review on the file, not the check. Reading waivers from the base branch instead would close this; it
-> is a candidate improvement.
+**New waivers are flagged.** The governor reads the waiver file from the pull request, so a waiver added in a PR
+counts for that PR's check straight away. To make that visible, the comment's **Waived** table has a status
+column: ✅ *Already on the base branch* (a code owner accepted it earlier) or ⏳ *New in this PR* (applied
+provisionally). New waivers also trigger a highlighted note that they become permanent only when the code owner
+approves and the PR merges. The control that actually stops an unapproved waiver is CODEOWNERS plus required
+review on that file, so make sure the ruleset exists.
+
+## How findings link back to your policy
+
+People read your policy, not our YAML. Every finding therefore links to:
+- 📘 **Read the policy**: the human-readable section for that rule (`policy_url` in `domain.yml`, one section per
+  rule, with the heading `RULE-ID Title`). In this PoC the pages are in [`docs/policy/`](policy/); in a real
+  deployment point `policy_url` at the policy on the documentation site. A rule can set its own `policy_url` to
+  link elsewhere.
+- 📖 **Rule definition**: the exact lines in `rules.yml`, for engineers.
+
+When you rename a rule's title, its policy heading must change with it or the anchor will no longer match. A test
+checks that the security policy page has the heading each rule links to.
 
 ## Operating it
 
@@ -147,17 +163,17 @@ Understand what a waiver covers, because approval is given once:
 | --- | --- |
 | See what the system said about a PR | The governor comment; the **workflow run** link at its foot |
 | Check the rules locally | `python -m pytest`, or `python -m governance local --repo <path> --base main --head HEAD` |
-| Find a rule's source | The 📖 Guidance link on each finding |
+| Find a rule's source | The 📘 policy and 📖 rule definition links on each finding |
 | Add or change a rule, add a new area | [extending.md](extending.md) |
 | Understand the design | [how-it-works.md](how-it-works.md) |
 | Review waivers across the organisation | Search repos for `.governance-waivers.yml`; expiry dates are in each file |
 
 ## Setup checklist (before relying on it)
 
-- [ ] `CODEOWNERS` in this repo with your teams against their folders
+- [x] `CODEOWNERS` in this repo (placeholder owner). Replace with your teams against their folders
 - [ ] Branch ruleset on `main`: require pull request, require code owner review, require the CI check
-- [ ] In each consuming repo: `CODEOWNERS` entry for `.governance-waivers.yml` pointing at the governance team
+- [x] Demo app has a `CODEOWNERS` entry for `.governance-waivers.yml` (placeholder owner). In each consuming repo, point it at the governance team
 - [ ] In each consuming repo: ruleset requiring the `governed / governor` check
 - [ ] `waivers.require_approval: true` once there is a second approver
 - [ ] Pin consuming repos to a release tag instead of `@main` when you want controlled rollouts
-- [ ] Replace the example rules, owners and contacts with real ones
+- [ ] Replace the example rules, policy pages, owners and contacts with real ones

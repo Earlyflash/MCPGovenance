@@ -8,6 +8,8 @@ The demo consumer is [MCPGovenance-DemoApp](https://github.com/Earlyflash/MCPGov
 
 For the reasoning, the step-by-step flow and the properties to protect, read [docs/how-it-works.md](docs/how-it-works.md). To add rules, change policy or add a new area, read [docs/extending.md](docs/extending.md).
 
+**Human-readable policy:** [docs/policy/](docs/policy/) (what people read; each finding links to its section).
+
 **Guides by audience:** [for governance teams](docs/for-governance-teams.md) (writing policy, approving changes and waivers) and [for developers](docs/for-developers.md) (reading the comment, fixing findings, asking for a waiver).
 
 ```

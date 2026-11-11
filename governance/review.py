@@ -73,6 +73,7 @@ async def review_domain(domain_id: str, root: Path, repo: Path, triage_data: dic
                     message=message,
                     guidance_version=info["guidance_version"],
                     guidance_url=g.get("guidance_url", ""),
+                    policy_url=g.get("policy_url", ""),
                     remediation=g["remediation"],
                     owner=info["owner"],
                     waiver_route=route["waiver_route"],
@@ -92,6 +93,7 @@ async def review_domain(domain_id: str, root: Path, repo: Path, triage_data: dic
             title=info.get("title", ""),
             contact=info.get("contact", ""),
             knowledge_url=info.get("knowledge_url", ""),
+            policy_url=info.get("policy_url", ""),
             findings=[f.to_dict() for f in findings],
             stats={"files_considered": len(ctx.live_files()), "rules_available": len(rules), "full_scan": full},
         )
