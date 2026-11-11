@@ -82,6 +82,8 @@ def record(domain: str, tool: str, args: dict[str, Any], result_text: str, now: 
 def load(paths: list[Path]) -> list[dict[str, Any]]:
     files: list[Path] = []
     for p in paths:
+        if not p.exists():
+            raise FileNotFoundError(f"no such log or folder: {p}")
         files += sorted(p.rglob("demand*.jsonl")) if p.is_dir() else [p]
     rows = []
     for f in files:

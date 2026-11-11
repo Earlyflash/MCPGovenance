@@ -135,7 +135,11 @@ def cmd_ask(a: argparse.Namespace) -> int:
 
 def cmd_demand(a: argparse.Namespace) -> int:
     from . import demand
-    rows = demand.load([Path(p) for p in a.logs])
+    try:
+        rows = demand.load([Path(p) for p in a.logs])
+    except FileNotFoundError as exc:
+        print(exc, file=sys.stderr)
+        return 2
     summary = demand.summarise(rows, a.top)
     text = json.dumps(summary, indent=2) if a.json else demand.render(summary)
     print(text)
