@@ -47,7 +47,7 @@ def _blurb(v: dict[str, Any]) -> str:
     if v["verdict"] == "fail":
         n = len(real) or c["block"]
         return (f"You are nearly there. There {'is' if n == 1 else 'are'} {_things(n)} we would love your help with before this can merge. "
-                "None of it is a judgement on you: it is what our shared guidance asks of every change, and each item below comes with a way forward.")
+                "It is simply what our shared guidance asks of every change, and each item below comes with a way forward.")
     if v["verdict"] == "pass-with-warnings":
         n = c["warn"]
         return (f"Good news: this can merge. We noticed {_things(n)} that would make it even better for the people who use what you are building. "
@@ -136,7 +136,7 @@ def render_comment(v: dict[str, Any], ctx: dict[str, Any] | None = None) -> str:
     if v["enforcement"] == "warn-only" and v["would_fail"]:
         headline, icon = "Would be blocked (warn-only rollout)", "⚠️"
 
-    out = [MARKER, f"# {icon} Governance review: {headline}", "", "Hi 👋 and thank you for this pull request. Here is what our review found, written to help you rather than to judge you.", "",
+    out = [MARKER, f"# {icon} Governance review: {headline}", "", "Hi 👋 and thank you for this pull request. Here is what our review found, written to help and guide you.", "",
            f"> {_blurb(v)}", ""]
 
     stage = (v.get("stage") or {}).get("stage")
@@ -278,7 +278,7 @@ def render_comment(v: dict[str, Any], ctx: dict[str, Any] | None = None) -> str:
         foot.append(f"commit `{ctx['head']}`")
     if ctx.get("run_url"):
         foot.append(f"[workflow run]({ctx['run_url']})")
-    foot.append("PR governance PoC · here to help, not to judge")
+    foot.append("PR governance PoC · here to help")
     out += ["---", "<sub>" + " · ".join(foot) + "</sub>"]
 
     text = "\n".join(out)

@@ -223,7 +223,7 @@ def test_comment_speaks_kindly_and_keeps_its_tables(tmp_path):
     f["people_impact"] = "Someone on the network could read what is sent."
     result(tmp_path, "security", "gate", [f])
     c = render_comment(govern(policy(), triage("security"), tmp_path, today=TODAY))
-    assert "thank you for this pull request" in c and "None of it is a judgement on you" in c
+    assert "thank you for this pull request" in c and "simply what our shared guidance asks" in c
     assert "**A way forward:**" in c and "**Why it matters:** Someone on the network could read what is sent." in c
     assert "| Area | Result |" in c and "| ⛔ Needs fixing |" in c  # the detail tables are still there
     assert "violat" not in c.lower() and "you failed" not in c.lower()
