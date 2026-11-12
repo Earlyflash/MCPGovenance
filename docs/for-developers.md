@@ -2,7 +2,7 @@
 
 Every pull request in a governed repository is automatically reviewed against your organisation's technology
 policy: security, accessibility, enterprise alignment, and any other area added. You get one comment on your PR
-that says what is wrong, why, how to fix it, and who to ask.
+written in plain words: what we noticed, why it matters, a way forward, and who to ask.
 
 ## What you see
 
@@ -70,7 +70,7 @@ stage: pilot     # scan | pilot | production
 
 Only the areas relevant to your change run. A docs-only change gets security only. Touching `package.json`,
 `requirements.txt`, a `Dockerfile` or `docs/adr/` also runs enterprise alignment. HTML changes run accessibility.
-The foot of the comment lists areas that did not apply.
+Areas that did not apply are still listed in the scoreboard, marked ➖ *Not rechecked*, so you can see nothing was skipped by accident.
 
 ## Fixing a finding
 

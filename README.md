@@ -32,7 +32,7 @@ For the reasoning, the step-by-step flow and the properties to protect, read [do
                                   governor ── applies each domain's mode, waivers and rollout settings,
                                       │       posts ONE comment, passes or fails ONE required check
                                       ▼
-                         PR author sees what, why, how to fix, who to ask
+                         PR author sees what we noticed, why it matters, a way forward, who to ask
 ```
 
 ## The three layers

@@ -82,7 +82,7 @@ One comment, updated in place as they push.
 
 One check to require: governed / governor.
 
-Why, how to fix, who to ask, with a link to the plain-language policy.
+A kind, plain-spoken note: what we noticed, why it matters, a way forward, who to ask.
 
 A machine-readable block, so Copilot can fix its own pull request.
 

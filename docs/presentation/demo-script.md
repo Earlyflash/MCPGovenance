@@ -39,7 +39,7 @@ Open [PR 3](https://github.com/Earlyflash/MCPGovenance-DemoApp/pull/3). It adds 
 
 1. **Set the scene.** Say: this is an ordinary pull request. The author did nothing special. Scroll to the bottom of the conversation tab.
 2. **Show the check.** Point at the failing check, governed / governor. Say: there is one check to require, however many areas we add.
-3. **Show the comment.** Point at the banner (Blocked), then the totals row (3 blocking), then the scoreboard. Say: each area reviews on its own; this comment only collates them. Here only security applied, because only a Python file changed.
+3. **Show the comment.** Point at the banner (Blocked), then the totals row (3 needing a fix), then the scoreboard. Say: each area reviews on its own; this comment only collates them. Here only security applied, because only a Python file changed; the other two are listed as Not rechecked, so nothing is silently skipped.
 4. **Open one finding.** Pick the secret (SEC-001, admin.py line 5). Read the **What we noticed** line: the value is redacted, so the comment never leaks the secret again. Then read **Why it matters**, which says in plain words who is affected, and **A way forward**. Point out the tone: the comment opens by thanking the author, and nothing in it blames them.
 5. **Follow the policy link.** Click **The policy, in plain words**. Say: engineers read the plain-language policy; **The exact rule** link is for people who maintain it.
 6. **Point at the owner.** Under the domain heading, show the owner and contact. Say: every finding says who to ask.
