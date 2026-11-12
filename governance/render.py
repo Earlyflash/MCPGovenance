@@ -152,8 +152,12 @@ def render_comment(v: dict[str, Any], ctx: dict[str, Any] | None = None) -> str:
                 continue  # the promotion alert above already says this
             out += ["> [!NOTE]", f"> {n}", ""]
 
+    skipped = [f"| **{n}** | ➖ Not rechecked | · | · | · | · | Nothing in this change affects it, so we left it as it was | |" for n in v["not_triggered"]]
     if not v["domains"]:
-        out += ["No governance domains apply to the files in this pull request.", ""]
+        out += ["None of our review areas are affected by the files in this pull request, so there was nothing to recheck. 💛", ""]
+        if skipped:
+            out += ["### Scoreboard", "", "| Area | Result | ⛔ | ⚠️ | ℹ️ | 🧾 | How it works | Who to ask |",
+                    "| --- | --- | :---: | :---: | :---: | :---: | --- | --- |", *skipped, ""]
     else:
         scope = "the whole repository (full scan)" if v.get("full_scan") else f"{v.get('changed_files', 0)} changed file(s)"
         out += [
@@ -174,6 +178,7 @@ def render_comment(v: dict[str, Any], ctx: dict[str, Any] | None = None) -> str:
                 f"| **{d['domain']}** | {_domain_status(d)} | {_cell(dc.get('block', 0), '')} | {_cell(dc.get('warn', 0), '')} | "
                 f"{_cell(dc.get('info', 0), '')} | {_cell(dc.get('waived', 0), '')} | {MODE_HELP.get(d['mode'], d['mode'])} | {d['owner']} |"
             )
+        out += skipped
         out.append("")
 
     if v["enforcement"] == "warn-only" and v["verdict"] != "fail":
@@ -272,8 +277,6 @@ def render_comment(v: dict[str, Any], ctx: dict[str, Any] | None = None) -> str:
             json.dumps({"verdict": v["verdict"], "stage": stage, "findings": compact}, indent=2), "```", "", "</details>", ""]
 
     foot = []
-    if v["not_triggered"]:
-        foot.append(f"Not needed for this change: {', '.join(v['not_triggered'])}")
     if ctx.get("head"):
         foot.append(f"commit `{ctx['head']}`")
     if ctx.get("run_url"):

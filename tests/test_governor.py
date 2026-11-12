@@ -64,7 +64,8 @@ def test_clean_run_passes(tmp_path):
 def test_no_domains_passes(tmp_path):
     v = govern(policy(), triage(), tmp_path, today=TODAY)
     assert v["verdict"] == "pass" and v["domains"] == []
-    assert "No governance domains apply" in render_comment(v)
+    c = render_comment(v)
+    assert "nothing to recheck" in c and "| **security** | ➖ Not rechecked" in c
 
 
 def test_missing_required_reviewer_fails_closed_but_optional_only_warns(tmp_path):
@@ -185,6 +186,7 @@ def test_comment_has_banner_scoreboard_and_next_steps(tmp_path):
     c = render_comment(v, {"run_url": "https://example.test/run/1", "head": "abc1234"})
     assert "# ⛔ Governance review: Blocked" in c and "[!CAUTION]" in c
     assert "### Scoreboard" in c and "| **security** |" in c
+    assert "| **accessibility** | ➖ Not rechecked" in c and "Nothing in this change affects it" in c
     assert "### What would help next" in c and "[workflow run](https://example.test/run/1)" in c and "abc1234" in c
 
 
