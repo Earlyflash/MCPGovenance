@@ -28,6 +28,8 @@ A product declares its stage (see [guardrails by stage](../guardrails.md)). A gu
 
 This technology is on the banned list in the technology catalogue.
 
+**What it means for people:** It has been taken off our approved list, usually because of a security or support worry, so it could cause your team trouble later.
+
 **Why:** Banned technology must not be introduced or kept. An ADR does not unlock it. Only a waiver approved by the Office of the CTO does, and it must expire.
 
 **What to do:** Replace it with the preferred alternative named above, or request a time-limited waiver from the Office of the CTO.
@@ -50,6 +52,8 @@ Prefer:
 **By stage:** 🔍 Scan: ▫️ not yet → 🧪 Pilot: ⚠️ warning → 🚀 Production: ⛔ blocks the merge
 
 This technology is deprecated in the technology catalogue. New use is discouraged.
+
+**What it means for people:** It is on its way out, so your team would be building on something that will need replacing.
 
 **Why:** Do not start new work on deprecated technology. Existing use should move to the preferred alternative on the next planned change. If you must add it, record why in an ADR.
 
@@ -74,6 +78,8 @@ Prefer:
 
 This technology is not in the technology catalogue, so it has not been assessed. Unknown is not the same as permitted.
 
+**What it means for people:** Nobody has looked at it yet, so we cannot say whether it is safe and supportable. A quick assessment helps you and whoever maintains it next.
+
 **Why:** Prefer an adopted or approved technology for the same job. If nothing on the catalogue fits, open an assessment request and record the decision in an ADR so the catalogue can learn from it.
 
 **What to do:** Pick a catalogue option, or add an ADR under docs/adr/ and request an assessment.
@@ -96,6 +102,8 @@ Prefer:
 **By stage:** 🔍 Scan: ▫️ not yet → 🧪 Pilot: ▫️ not yet → 🚀 Production: ℹ️ note
 
 This technology is allowed only under the conditions shown in the catalogue.
+
+**What it means for people:** It is allowed with conditions, so a quick check that you meet them keeps your team in good standing.
 
 **Why:** Trial technology is for the use cases named in its conditions. Tolerated technology is for existing systems only.
 
@@ -120,6 +128,8 @@ Prefer:
 
 The change introduces technology that is off the paved road, but no ADR is included to record the decision.
 
+**What it means for people:** Writing down why you chose something unusual helps the next person who inherits it understand the choice.
+
 **Why:** Off-road choices are allowed when they are deliberate and recorded. Add an ADR under docs/adr/ using the template: the guidance you consulted (with versions), the deviation, and any tension with strategy.
 
 **What to do:** Add docs/adr/NNNN-title.md from the template and complete every section.
@@ -142,6 +152,8 @@ docs/adr/0007-use-htmx-for-internal-tools.md   # with Guidance consulted, Deviat
 **By stage:** 🔍 Scan: ▫️ not yet → 🧪 Pilot: ▫️ not yet → 🚀 Production: ⚠️ warning
 
 The ADR is missing a required section or still contains TBD.
+
+**What it means for people:** A half-finished decision record leaves future teammates guessing why something was chosen.
 
 **Why:** An ADR must have the sections Guidance consulted, Deviations requiring approval and Tensions with strategy. "None" is a valid answer; "TBD" is not.
 

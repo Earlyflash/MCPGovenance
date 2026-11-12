@@ -8,6 +8,7 @@ rules:
     confidence: high
     tags: [secrets, credentials, tokens, keys, password]
     summary: A credential, key or token is written into source control, where it is visible to everyone with read access and persists in history.
+    people_impact: "Anyone who can see this code can use the secret, and once it is in the history it is hard to take back. Sorting it now protects you, your team and your customers."
     guidance: >-
       Secrets must never be committed. Read them at runtime from the environment or a secrets manager.
       If one has been committed it is compromised: rotate it first, then remove it. Deleting the line is not enough.
@@ -27,6 +28,7 @@ rules:
     confidence: medium
     tags: [injection, subprocess, shell, command]
     summary: Running commands through a shell (shell=True, os.system) turns any untrusted input in the command into command injection.
+    people_impact: "If any part of the command comes from a user, someone could make your server run something you never intended."
     guidance: >-
       Pass an argument list to subprocess without a shell. If a shell is genuinely required, the input must be
       constant or strictly validated, and the reason recorded in a waiver.
@@ -44,6 +46,7 @@ rules:
     confidence: high
     tags: [tls, https, certificates, verify, mitm]
     summary: Disabling certificate verification removes the protection HTTPS provides and allows man-in-the-middle attacks.
+    people_impact: "Without the check, someone on the network could pretend to be the other side and read or change what is sent, such as your customers' data."
     guidance: >-
       Never disable certificate verification, including in test or development code that can be copied elsewhere.
       Trust an internal certificate authority by configuring its certificate bundle instead.
@@ -61,6 +64,7 @@ rules:
     confidence: medium
     tags: [eval, exec, injection, code]
     summary: eval, exec and new Function run text as code, so any attacker-influenced string becomes arbitrary code execution.
+    people_impact: "Text that reaches this could be run as code, so a cleverly crafted input might take control of your application."
     guidance: >-
       Parse data with a data parser (json, ast.literal_eval) and dispatch behaviour through explicit lookup tables,
       not by evaluating strings.
@@ -80,6 +84,7 @@ rules:
     confidence: high
     tags: [docker, container, root, user]
     summary: A container whose final stage has no non-root USER runs as root, which widens the impact of any compromise.
+    people_impact: "If anything went wrong inside the container, running as root would give it far more power than it needs."
     guidance: Create an unprivileged user in the image and switch to it before the entrypoint.
     remediation: Add a non-root USER in the final stage of the Dockerfile.
     exemplars:
@@ -102,6 +107,7 @@ rules:
     confidence: medium
     tags: [terraform, network, security-group, ingress, cidr]
     summary: A rule allowing 0.0.0.0/0 or ::/0 exposes the resource to every address on the internet.
+    people_impact: "Anyone on the internet could try to reach this, not only the people who should."
     guidance: Scope ingress to known CIDR ranges or security groups. Public ingress is acceptable only behind an approved load balancer or CDN.
     remediation: Restrict the CIDR to the ranges that need access, or reference a security group.
     exemplars:

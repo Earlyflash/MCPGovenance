@@ -21,6 +21,7 @@
     "applies_from": { "type": "string", "enum": ["scan", "pilot", "production"], "description": "Product stage this guardrail starts to apply in." },
     "severity_by_stage": { "type": ["object", "null"], "description": "Severity of the guardrail at each product stage; null before it applies." },
     "policy_url": { "type": "string", "description": "Link to the human-readable policy for this rule." },
+    "people_impact": { "type": "string", "description": "One plain sentence on who this affects and how; used to write the PR comment kindly." },
     "guidance_url": { "type": "string", "description": "Link to this rule in the domain's guidance." },
     "guidance_version": { "type": "string", "description": "Version of the domain knowledge the finding was explained from." },
     "remediation": { "type": "string" },

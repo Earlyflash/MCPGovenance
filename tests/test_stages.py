@@ -57,7 +57,7 @@ def test_a_pull_request_can_raise_the_stage_and_that_triggers_a_full_scan(tmp_pa
 
 def test_a_pull_request_cannot_lower_the_stage(tmp_path):
     info = detect(tmp_path, {".governance.yml": "stage: production\n"}, {".governance.yml": "stage: scan\n"})
-    assert info["stage"] == "production" and any("cannot lower" in n for n in info["notes"])
+    assert info["stage"] == "production" and any("never lower it" in n for n in info["notes"])
 
 
 def test_first_declaration_in_a_pr_is_used_but_flagged(tmp_path):
@@ -77,7 +77,7 @@ def test_later_stage_guardrails_are_previewed_but_not_counted(tmp_path):
     v = govern(policy(), pilot, tmp_path, today=TODAY)
     assert v["verdict"] == "pass" and v["counts"]["block"] == 0 and v["counts"]["deferred"] == 1
     c = render_comment(v)
-    assert "Coming at a higher stage" in c and "Production" in c and "SEC-005" in c
+    assert "coming at a higher stage" in c and "Production" in c and "SEC-005" in c
     prod = {**tri("security"), "stage": {"stage": "production", "source": "x", "promoted": False, "notes": []}}
     v = govern(policy(), prod, tmp_path, today=TODAY)
     assert v["verdict"] == "fail" and v["counts"]["block"] == 1 and v["counts"]["deferred"] == 0
@@ -97,12 +97,12 @@ def test_a_warning_at_pilot_blocks_in_production(tmp_path):
     f = next(f for f in v["findings"] if f["rule_id"] == "SEC-005")
     assert f["effective_severity"] == "warn" and not f["deferred"] and v["verdict"] == "pass-with-warnings"
     assert f["escalates_at"] == {"stage": "production", "severity": "block"}
-    assert "Heads up" in render_comment(v) and "becomes blocking" in render_comment(v)
+    assert "A heads-up for later" in render_comment(v) and "becomes a blocker" in render_comment(v)
     repo, b, h = make_pr(tmp_path / "q", {".governance.yml": "stage: production\n"}, {"Dockerfile": DOCKER_ROOT})
     v = pipeline(repo, b, h, tmp_path / "qo")
     f = next(f for f in v["findings"] if f["rule_id"] == "SEC-005")
     assert f["effective_severity"] == "block" and f["escalated"] and v["verdict"] == "fail"
-    assert "Stricter at this stage" in render_comment(v)
+    assert "A bit stricter at this stage" in render_comment(v)
 
 
 def test_a_guardrail_for_a_later_stage_is_a_preview_in_the_pipeline(tmp_path):
@@ -126,7 +126,7 @@ def test_promotion_pr_checks_existing_code(tmp_path):
     repo, b, h = make_pr(tmp_path, {".governance.yml": "stage: pilot\n", "Dockerfile": DOCKER_ROOT}, {".governance.yml": "stage: production\n"})
     v = pipeline(repo, b, h, tmp_path / "o")
     assert v["promotion_scan"] and v["verdict"] == "fail" and "SEC-005" in rule_ids(v)
-    assert "Stage promotion" in render_comment(v)
+    assert "You are moving up a stage" in render_comment(v)
 
 
 def test_scan_stage_still_stops_secrets(tmp_path):

@@ -81,6 +81,7 @@ def policy_page(root: Path, domain: str) -> str:
                 f"**Applies from:** {st.ICONS[r['applies_from']]} {st.LABELS[r['applies_from']]}  ",
                 f"**By stage:** {_strip(info, r)}", "",
                 r.get("summary", "").strip(), "",
+                *([f"**What it means for people:** {r['people_impact']}", ""] if r.get("people_impact") else []),
                 "**Why:** " + " ".join(r.get("guidance", "").split()), "",
                 "**What to do:** " + r.get("remediation", "").strip(), ""]
         ex = r.get("exemplars") or {}
@@ -142,7 +143,7 @@ def overview(root: Path) -> str:
            "| Strictest wins | If it is declared in more than one place, the highest stage applies. |",
            "| A PR can raise it, never lower it | Raising the stage in a pull request re-checks the **whole product**, not only the changed lines. Lowering it has no effect until the lower stage is merged with code owner approval. |",
            "| Not declared | The strictest stage (production) applies, so forgetting never makes a product look safer than it is. |",
-           "| Seeing ahead | Findings for guardrails from a later stage are shown in the PR comment under *Coming at a higher stage*, but do not count. |", ""]
+           "| Seeing ahead | Findings for guardrails from a later stage are shown in the PR comment under *A look ahead: coming at a higher stage*, but do not count. |", ""]
     return "\n".join(out)
 
 

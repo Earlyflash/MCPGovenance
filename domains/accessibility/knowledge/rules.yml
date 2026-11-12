@@ -9,6 +9,7 @@ rules:
     confidence: high
     tags: [images, alt, text, wcag-1.1.1]
     summary: An image has no alt attribute, so screen reader users get nothing (or the file name) in its place.
+    people_impact: "Someone using a screen reader would hear nothing (or just a file name) where this image is, so they would miss what it shows."
     guidance: >-
       Every img needs an alt attribute. Describe the purpose of informative images. Use alt="" for purely
       decorative images so assistive technology skips them.
@@ -26,6 +27,7 @@ rules:
     confidence: high
     tags: [language, lang, html, wcag-3.1.1]
     summary: Without a lang attribute on the html element screen readers may pronounce the page in the wrong language.
+    people_impact: "A screen reader may read the page aloud in the wrong language, which can make it very hard to follow."
     guidance: Set the primary language of every page on the html element.
     remediation: Add lang to the html element, for example <html lang="en-GB">.
     exemplars:
@@ -41,6 +43,7 @@ rules:
     confidence: medium
     tags: [forms, label, input, wcag-1.3.1, wcag-3.3.2]
     summary: An input, select or textarea has no programmatic label, so assistive technology cannot tell users what to enter.
+    people_impact: "Someone using a screen reader or voice control would not know what this box is asking for, which can stop them finishing the form."
     guidance: >-
       Every form control needs a visible label associated with it (label for/id, or wrapping the control).
       Use aria-label only when a visible label is not possible.
@@ -59,6 +62,7 @@ rules:
     confidence: medium
     tags: [links, text, navigation, wcag-2.4.4]
     summary: Link text such as "click here" or "read more" is meaningless when links are read out of context.
+    people_impact: "People who skim through a list of links will not know where this one goes. \"Click here\" on its own tells them nothing."
     guidance: Link text should make sense on its own and describe where the link goes.
     remediation: Rewrite the link text to describe the destination.
     exemplars:
@@ -74,6 +78,7 @@ rules:
     confidence: high
     tags: [title, page, wcag-2.4.2]
     summary: A page without a title gives screen reader users and tab bars nothing to identify it by.
+    people_impact: "Without a title, people with lots of tabs open, or using a screen reader, cannot tell which page is yours."
     guidance: Every page needs a short, unique, descriptive title element.
     remediation: Add a descriptive <title> inside <head>.
     exemplars:
@@ -89,6 +94,7 @@ rules:
     confidence: medium
     tags: [button, name, icon, wcag-4.1.2]
     summary: A button with no text and no aria-label is announced as just "button".
+    people_impact: "A screen reader would just say \"button\", so someone would not be able to tell what it does."
     guidance: Give every button visible text, or an aria-label when it only contains an icon.
     remediation: Add visible text or an aria-label that says what the button does.
     exemplars:

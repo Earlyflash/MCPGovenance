@@ -29,6 +29,7 @@ class Finding:
     check_type: str = "deterministic"  # deterministic | agent
     guidance_url: str = ""  # link to this rule in the domain's guidance
     policy_url: str = ""  # link to the human-readable policy for this rule
+    people_impact: str = ""  # one plain sentence on who this affects and how (used to write the PR comment kindly)
     applies_from: str = "scan"  # the product stage this guardrail starts to apply in
     severity_by_stage: dict[str, Any] | None = None  # severity at each stage (None before it applies)
 

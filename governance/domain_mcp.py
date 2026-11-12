@@ -177,6 +177,7 @@ def build_server(domain_dir: Path) -> tuple[MCPServer, Knowledge]:
                         "title": r["title"],
                         "severity": r["severity"],
                         "summary": r.get("summary", ""),
+                        "people_impact": r.get("people_impact", ""),
                         "guidance": r.get("guidance", ""),
                         "remediation": r.get("remediation", ""),
                         "tags": r.get("tags", []),

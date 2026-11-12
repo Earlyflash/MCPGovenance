@@ -90,15 +90,17 @@ Governance review: Blocked
 
 Product stage: Scan → Pilot → Production
 
-BLOCKING · SEC-003 · TLS certificate verification disabled
+⛔ Needs fixing · SEC-003 · TLS certificate verification disabled
 
-admin.py:9 requests.get(url, verify=False)
+What we noticed: admin.py:9 requests.get(url, verify=False)
 
-How to fix: Remove verify=False and trust the organisation certificate bundle.
+Why it matters: someone on the network could read or change what is sent.
 
-Read the policy · Rule definition
+A way forward: remove verify=False and trust the organisation certificate bundle.
 
-Owner: Security Engineering · guidance version recorded
+Want to read more? The policy, in plain words · The exact rule
+
+Questions? Ask Security Engineering
 
 > **Speaker notes:** About 1 minute. This is a mock-up of the real comment you will see in the demo. The important things are that it is one comment that updates, the fix is stated, the owner is named and there is a link back to the human-readable policy. The JSON block at the bottom of the real comment is for AI agents.
 

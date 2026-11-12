@@ -75,6 +75,7 @@ async def review_domain(domain_id: str, root: Path, repo: Path, triage_data: dic
                     guidance_version=info["guidance_version"],
                     guidance_url=g.get("guidance_url", ""),
                     policy_url=g.get("policy_url", ""),
+                    people_impact=g.get("people_impact", ""),
                     applies_from=g.get("applies_from", "scan"),
                     severity_by_stage=g.get("severity_by_stage"),
                     remediation=g["remediation"],

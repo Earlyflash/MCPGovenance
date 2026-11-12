@@ -20,13 +20,14 @@ The comment updates itself when you push. It does not add a new one each time.
 ### Reading a finding
 
 ```
-⛔ Blocking · SEC-003 · TLS certificate verification disabled
+⛔ Needs fixing before this can merge · SEC-003 · TLS certificate verification disabled
 📍 admin.py:9
-Found:         requests.get(url, verify=False)
-Why it matters: ...
-How to fix:    ...
-📘 Read the policy · 📖 Rule definition   ← the policy as people read it, and the exact rule
-What good looks like  ▸ (expand for an example)
+What we noticed:  requests.get(url, verify=False)
+Why it matters:   who is affected, in plain words
+In more detail:   the technical reason
+A way forward:    what to do next
+📘 The policy, in plain words · 📖 The exact rule   ← the policy as people read it, and the rule as coded
+See an example that works  ▸ (expand)
 ```
 
 | Part | Meaning |
@@ -35,7 +36,7 @@ What good looks like  ▸ (expand for an example)
 | Rule id | Stable name, for example `SEC-003`. Quote it when asking for help |
 | 📍 location | File and line you changed |
 | 📘 Policy link | The human-readable policy for this rule. Start here |
-| 📖 Rule definition | The rule as coded, for engineers |
+| 📖 The exact rule | The rule as coded, for engineers |
 | Owner and contact | Who to ask. Shown under each domain heading |
 
 Only the lines **your PR added or changed** are judged. Old code is not held against you.
@@ -56,9 +57,9 @@ stage: pilot     # scan | pilot | production
 (or put `<!-- governance-stage: pilot -->` in your README). The comment shows your stage at the top.
 
 - A guardrail applies from its stage onward, so moving up only ever adds guardrails.
-- Some guardrails also get **stricter**: a warning at pilot can block in production. The comment says so (*Heads up: at Production it becomes blocking*), so you can fix it early rather than at the last minute.
+- Some guardrails also get **stricter**: a warning at pilot can block in production. The comment says so (*A heads-up for later: at Production it becomes a blocker*), so you can fix it early rather than at the last minute.
 - **Not declared means production**, the strictest stage.
-- Findings from a guardrail that starts at a later stage appear under **Coming at a higher stage**. They are real
+- Findings from a guardrail that starts at a later stage appear under **A look ahead: coming at a higher stage**. They are real
   problems in your change, but they do not count today. It is a free look at what promotion will demand.
 - **Moving up a stage** is a pull request that changes `stage:`. The whole repository is then checked against the
   new guardrails, not just your diff, so you find out whether you are ready. Fix what it finds in the same PR or
@@ -73,7 +74,7 @@ The foot of the comment lists areas that did not apply.
 
 ## Fixing a finding
 
-1. Read **How to fix** and the example under **What good looks like**.
+1. Read **A way forward** and the example under **See an example that works**.
 2. Make the change and push. The comment refreshes.
 3. If it is not clear, open the 📘 policy link or contact the owner shown for that domain.
 

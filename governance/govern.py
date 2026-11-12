@@ -82,7 +82,9 @@ def validate_waiver(w: dict[str, Any], policy: dict[str, Any], today: dt.date, a
 def _synthetic(domain: str, rule_id: str, title: str, message: str, severity: str, owner: str = "unknown") -> dict[str, Any]:
     return {
         "domain": domain, "rule_id": rule_id, "title": title, "severity": severity, "message": message,
-        "guidance_version": "unknown", "remediation": f"Re-run the workflow. If it keeps failing, contact the {domain} owner.",
+        "guidance_version": "unknown",
+        "remediation": f"Please re-run the workflow, which usually sorts it. If it keeps happening, tell the {domain} owner and they will look into it right away.",
+        "people_impact": "This is on our side, not yours: one of our checks could not finish, so we cannot yet say whether your change is fine.",
         "owner": owner, "waiver_route": "", "file": None, "line": None, "evidence": "", "exemplar_good": "",
         "confidence": "high", "check_type": "deterministic",
     }
@@ -110,7 +112,7 @@ def govern(
         row = {"domain": d, "mode": "unknown", "owner": "unknown", "guidance_version": "unknown", "status": "missing", "waiver_route": "",
                "title": d, "contact": "", "knowledge_url": "", "policy_url": "", "files_considered": None}
         if not path.is_file():
-            findings.append(_synthetic(d, "GOV-001", "Reviewer did not report",
+            findings.append(_synthetic(d, "GOV-001", "One of our checks did not report back",
                                        f"The {d} reviewer produced no result, so this domain could not be checked.",
                                        "block" if required else "warn"))
         else:
@@ -119,7 +121,7 @@ def govern(
                        title=res.get("title") or d, contact=res.get("contact", ""), knowledge_url=res.get("knowledge_url", ""), policy_url=res.get("policy_url", ""),
                        files_considered=(res.get("stats") or {}).get("files_considered"))
             if res["status"] != "ok":
-                findings.append(_synthetic(d, "GOV-002", "Reviewer failed", f"The {d} reviewer failed: {res.get('error', 'unknown error')}",
+                findings.append(_synthetic(d, "GOV-002", "One of our checks hit a problem", f"The {d} reviewer failed: {res.get('error', 'unknown error')}",
                                            "block" if required else "warn", res["owner"]))
             for f in res["findings"]:
                 row["waiver_route"] = row["waiver_route"] or f.get("waiver_route", "")

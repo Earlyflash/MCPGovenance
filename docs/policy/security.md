@@ -28,6 +28,8 @@ A product declares its stage (see [guardrails by stage](../guardrails.md)). A gu
 
 A credential, key or token is written into source control, where it is visible to everyone with read access and persists in history.
 
+**What it means for people:** Anyone who can see this code can use the secret, and once it is in the history it is hard to take back. Sorting it now protects you, your team and your customers.
+
 **Why:** Secrets must never be committed. Read them at runtime from the environment or a secrets manager. If one has been committed it is compromised: rotate it first, then remove it. Deleting the line is not enough.
 
 **What to do:** Remove the value, load it from an environment variable or secrets manager, and rotate the exposed credential.
@@ -52,6 +54,8 @@ DB_PASSWORD = os.environ["DB_PASSWORD"]  # injected by the platform from the sec
 
 Running commands through a shell (shell=True, os.system) turns any untrusted input in the command into command injection.
 
+**What it means for people:** If any part of the command comes from a user, someone could make your server run something you never intended.
+
 **Why:** Pass an argument list to subprocess without a shell. If a shell is genuinely required, the input must be constant or strictly validated, and the reason recorded in a waiver.
 
 **What to do:** Use subprocess.run([...], shell=False) with an argument list, or request a waiver explaining why a shell is needed.
@@ -74,6 +78,8 @@ subprocess.run(["convert", filename, "out.png"], check=True)
 **By stage:** 🔍 Scan: ▫️ not yet → 🧪 Pilot: ⛔ blocks the merge → 🚀 Production: ⛔ blocks the merge
 
 Disabling certificate verification removes the protection HTTPS provides and allows man-in-the-middle attacks.
+
+**What it means for people:** Without the check, someone on the network could pretend to be the other side and read or change what is sent, such as your customers' data.
 
 **Why:** Never disable certificate verification, including in test or development code that can be copied elsewhere. Trust an internal certificate authority by configuring its certificate bundle instead.
 
@@ -98,6 +104,8 @@ requests.get(url, verify="/etc/ssl/internal-ca.pem")
 
 eval, exec and new Function run text as code, so any attacker-influenced string becomes arbitrary code execution.
 
+**What it means for people:** Text that reaches this could be run as code, so a cleverly crafted input might take control of your application.
+
 **Why:** Parse data with a data parser (json, ast.literal_eval) and dispatch behaviour through explicit lookup tables, not by evaluating strings.
 
 **What to do:** Replace eval/exec with a parser or an explicit mapping of allowed operations.
@@ -121,6 +129,8 @@ value = ast.literal_eval(user_value)   # literals only, never code
 **By stage:** 🔍 Scan: ▫️ not yet → 🧪 Pilot: ⚠️ warning → 🚀 Production: ⛔ blocks the merge
 
 A container whose final stage has no non-root USER runs as root, which widens the impact of any compromise.
+
+**What it means for people:** If anything went wrong inside the container, running as root would give it far more power than it needs.
 
 **Why:** Create an unprivileged user in the image and switch to it before the entrypoint.
 
@@ -150,6 +160,8 @@ CMD ["python", "/app/app.py"]
 **By stage:** 🔍 Scan: ▫️ not yet → 🧪 Pilot: ⚠️ warning → 🚀 Production: ⛔ blocks the merge
 
 A rule allowing 0.0.0.0/0 or ::/0 exposes the resource to every address on the internet.
+
+**What it means for people:** Anyone on the internet could try to reach this, not only the people who should.
 
 **Why:** Scope ingress to known CIDR ranges or security groups. Public ingress is acceptable only behind an approved load balancer or CDN.
 

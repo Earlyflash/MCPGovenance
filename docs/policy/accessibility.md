@@ -28,6 +28,8 @@ A product declares its stage (see [guardrails by stage](../guardrails.md)). A gu
 
 An image has no alt attribute, so screen reader users get nothing (or the file name) in its place.
 
+**What it means for people:** Someone using a screen reader would hear nothing (or just a file name) where this image is, so they would miss what it shows.
+
 **Why:** Every img needs an alt attribute. Describe the purpose of informative images. Use alt="" for purely decorative images so assistive technology skips them.
 
 **What to do:** Add alt text that conveys the image's purpose, or alt="" if it is decorative.
@@ -51,6 +53,8 @@ Prefer:
 
 Without a lang attribute on the html element screen readers may pronounce the page in the wrong language.
 
+**What it means for people:** A screen reader may read the page aloud in the wrong language, which can make it very hard to follow.
+
 **Why:** Set the primary language of every page on the html element.
 
 **What to do:** Add lang to the html element, for example <html lang="en-GB">.
@@ -73,6 +77,8 @@ Prefer:
 **By stage:** 🔍 Scan: ▫️ not yet → 🧪 Pilot: ⚠️ warning → 🚀 Production: ⚠️ warning
 
 An input, select or textarea has no programmatic label, so assistive technology cannot tell users what to enter.
+
+**What it means for people:** Someone using a screen reader or voice control would not know what this box is asking for, which can stop them finishing the form.
 
 **Why:** Every form control needs a visible label associated with it (label for/id, or wrapping the control). Use aria-label only when a visible label is not possible.
 
@@ -98,6 +104,8 @@ Prefer:
 
 Link text such as "click here" or "read more" is meaningless when links are read out of context.
 
+**What it means for people:** People who skim through a list of links will not know where this one goes. "Click here" on its own tells them nothing.
+
 **Why:** Link text should make sense on its own and describe where the link goes.
 
 **What to do:** Rewrite the link text to describe the destination.
@@ -121,6 +129,8 @@ Prefer:
 
 A page without a title gives screen reader users and tab bars nothing to identify it by.
 
+**What it means for people:** Without a title, people with lots of tabs open, or using a screen reader, cannot tell which page is yours.
+
 **Why:** Every page needs a short, unique, descriptive title element.
 
 **What to do:** Add a descriptive <title> inside <head>.
@@ -143,6 +153,8 @@ Prefer:
 **By stage:** 🔍 Scan: ▫️ not yet → 🧪 Pilot: ⚠️ warning → 🚀 Production: ⚠️ warning
 
 A button with no text and no aria-label is announced as just "button".
+
+**What it means for people:** A screen reader would just say "button", so someone would not be able to tell what it does.
 
 **Why:** Give every button visible text, or an aria-label when it only contains an icon.
 

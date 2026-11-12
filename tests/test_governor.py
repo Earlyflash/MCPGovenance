@@ -100,7 +100,7 @@ def test_co_located_findings_from_two_domains_are_escalated(tmp_path):
     result(tmp_path, "accessibility", "advise", [finding("accessibility", "A11Y-004", "warn", "x.html", 4)])
     v = govern(policy(), triage("security", "accessibility"), tmp_path, today=TODAY)
     assert v["escalations"] == [{"file": "x.html", "line": 4, "domains": ["accessibility", "security"], "rules": ["A11Y-004", "SEC-003"]}]
-    assert "Review together" in render_comment(v)
+    assert "Better looked at together" in render_comment(v)
 
 
 # ---------- waivers ----------
@@ -135,7 +135,7 @@ def test_invalid_waivers_do_not_apply_and_are_reported(tmp_path, bad, why):
     v = waived(tmp_path, waiver(**bad))
     assert v["counts"]["warn"] == 1
     assert why in v["waiver_problems"][0]["problem"]
-    assert "Waivers that did not apply" in render_comment(v)
+    assert "We could not apply these exceptions" in render_comment(v)
 
 
 def test_secrets_can_never_be_waived(tmp_path):
@@ -163,7 +163,7 @@ def test_comment_has_marker_machine_block_and_fix_guidance(tmp_path):
     result(tmp_path, "security", "gate", [finding(exemplar_good="requests.get(u)")])
     v = govern(policy(), triage("security"), tmp_path, today=TODAY)
     c = render_comment(v)
-    assert c.startswith(MARKER) and "Blocked" in c and "fix it" in c and "What good looks like" in c
+    assert c.startswith(MARKER) and "Blocked" in c and "fix it" in c and "See an example that works" in c
     block = c.split("```json")[1].split("```")[0]
     assert json.loads(block)["findings"][0]["rule"] == "SEC-003"
 
@@ -185,7 +185,7 @@ def test_comment_has_banner_scoreboard_and_next_steps(tmp_path):
     c = render_comment(v, {"run_url": "https://example.test/run/1", "head": "abc1234"})
     assert "# ⛔ Governance review: Blocked" in c and "[!CAUTION]" in c
     assert "### Scoreboard" in c and "| **security** |" in c
-    assert "### What to do next" in c and "[workflow run](https://example.test/run/1)" in c and "abc1234" in c
+    assert "### What would help next" in c and "[workflow run](https://example.test/run/1)" in c and "abc1234" in c
 
 
 def test_every_finding_links_to_its_guidance(tmp_path):
@@ -213,6 +213,23 @@ def test_new_waivers_are_flagged_until_they_exist_on_the_base_branch(tmp_path):
     res.mkdir()
     result(res, "security", "gate", [finding(rule="SEC-002", severity="warn", file="scripts/x.py")])
     new = govern(pol, tri, res, [waiver(path="scripts/**")], None, TODAY, base_waivers=[])
-    assert new["findings"][0]["waiver"]["new_in_pr"] is True and "New in this PR" in render_comment(new)
+    assert new["findings"][0]["waiver"]["new_in_pr"] is True and "Proposed in this PR" in render_comment(new)
     old = govern(pol, tri, res, [waiver(path="scripts/**")], None, TODAY, base_waivers=[waiver(path="scripts/**")])
-    assert old["findings"][0]["waiver"]["new_in_pr"] is False and "New in this PR" not in render_comment(old)
+    assert old["findings"][0]["waiver"]["new_in_pr"] is False and "Proposed in this PR" not in render_comment(old)
+
+
+def test_comment_speaks_kindly_and_keeps_its_tables(tmp_path):
+    f = finding(exemplar_good="requests.get(u)")
+    f["people_impact"] = "Someone on the network could read what is sent."
+    result(tmp_path, "security", "gate", [f])
+    c = render_comment(govern(policy(), triage("security"), tmp_path, today=TODAY))
+    assert "thank you for this pull request" in c and "None of it is a judgement on you" in c
+    assert "**A way forward:**" in c and "**Why it matters:** Someone on the network could read what is sent." in c
+    assert "| Area | Result |" in c and "| ⛔ Needs fixing |" in c  # the detail tables are still there
+    assert "violat" not in c.lower() and "you failed" not in c.lower()
+
+
+def test_a_crashed_check_is_never_blamed_on_the_author(tmp_path):
+    v = govern(policy(), triage("security"), tmp_path, today=TODAY)  # no results file: the check never reported
+    c = render_comment(v)
+    assert v["verdict"] == "fail" and "That is on us, not you" in c

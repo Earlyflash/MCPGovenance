@@ -89,7 +89,7 @@ it cannot drift. Each rule's page in [`policy/`](policy/) shows its own row of �
 ```
 
 Severity can only rise with the stage, never fall, and the escalation stage must come after `applies_from`.
-The PR comment tells the author both ways: *Heads up, this becomes blocking at Production* while they are at
+The PR comment tells the author both ways: *A heads-up for later: this becomes a blocker at Production* while they are at
 pilot, and *Stricter at this stage* once they are there. Advice-only areas still never block, whatever the rule
 says. The ⛔/⚠️/ℹ️ matrix on each policy page shows the severity at every stage.
 
@@ -100,7 +100,7 @@ How a product declares its stage, and what you should know:
 - **A pull request can raise the stage, never lower it.** Raising it re-checks the whole product against the
   guardrails it adds (a *promotion scan*), which is your readiness gate. Lowering it takes effect only after the
   change is merged, so protect `.governance.yml` with CODEOWNERS like the waivers file.
-- **Later-stage findings are previewed, not counted.** The PR comment lists them under *Coming at a higher stage*
+- **Later-stage findings are previewed, not counted.** The PR comment lists them under *A look ahead: coming at a higher stage*
   so teams see what is ahead. They cannot be waived or blocked early.
 - Promoting a rule to an earlier stage (say pilot to scan) tightens it for every scan-stage product at once.
   Treat it like making a warning into a block: check the impact first.
@@ -191,11 +191,11 @@ review on that file, so make sure the ruleset exists.
 ## How findings link back to your policy
 
 People read your policy, not our YAML. Every finding therefore links to:
-- 📘 **Read the policy**: the human-readable section for that rule (`policy_url` in `domain.yml`, one section per
+- 📘 **The policy, in plain words**: the human-readable section for that rule (`policy_url` in `domain.yml`, one section per
   rule, with the heading `RULE-ID Title`). In this PoC the pages are in [`docs/policy/`](policy/); in a real
   deployment point `policy_url` at the policy on the documentation site. A rule can set its own `policy_url` to
   link elsewhere.
-- 📖 **Rule definition**: the exact lines in `rules.yml`, for engineers.
+- 📖 **The exact rule**: the exact lines in `rules.yml`, for engineers.
 
 When you rename a rule's title, its policy heading must change with it or the anchor will no longer match. A test
 checks that the security policy page has the heading each rule links to.

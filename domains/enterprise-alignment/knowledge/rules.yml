@@ -9,6 +9,7 @@ rules:
     confidence: high
     tags: [technology, banned, catalogue, radar]
     summary: This technology is on the banned list in the technology catalogue.
+    people_impact: "It has been taken off our approved list, usually because of a security or support worry, so it could cause your team trouble later."
     guidance: >-
       Banned technology must not be introduced or kept. An ADR does not unlock it. Only a waiver approved by the
       Office of the CTO does, and it must expire.
@@ -27,6 +28,7 @@ rules:
     confidence: high
     tags: [technology, deprecated, catalogue, radar]
     summary: This technology is deprecated in the technology catalogue. New use is discouraged.
+    people_impact: "It is on its way out, so your team would be building on something that will need replacing."
     guidance: >-
       Do not start new work on deprecated technology. Existing use should move to the preferred alternative on
       the next planned change. If you must add it, record why in an ADR.
@@ -45,6 +47,7 @@ rules:
     confidence: medium
     tags: [technology, unknown, catalogue, assessment]
     summary: This technology is not in the technology catalogue, so it has not been assessed. Unknown is not the same as permitted.
+    people_impact: "Nobody has looked at it yet, so we cannot say whether it is safe and supportable. A quick assessment helps you and whoever maintains it next."
     guidance: >-
       Prefer an adopted or approved technology for the same job. If nothing on the catalogue fits, open an
       assessment request and record the decision in an ADR so the catalogue can learn from it.
@@ -62,6 +65,7 @@ rules:
     confidence: high
     tags: [technology, trial, tolerated, conditions]
     summary: This technology is allowed only under the conditions shown in the catalogue.
+    people_impact: "It is allowed with conditions, so a quick check that you meet them keeps your team in good standing."
     guidance: Trial technology is for the use cases named in its conditions. Tolerated technology is for existing systems only.
     remediation: Check the conditions apply to your use. If they do not, choose an adopted technology.
     exemplars:
@@ -77,6 +81,7 @@ rules:
     confidence: high
     tags: [adr, evidence, decision, technology]
     summary: The change introduces technology that is off the paved road, but no ADR is included to record the decision.
+    people_impact: "Writing down why you chose something unusual helps the next person who inherits it understand the choice."
     guidance: >-
       Off-road choices are allowed when they are deliberate and recorded. Add an ADR under docs/adr/ using the
       template: the guidance you consulted (with versions), the deviation, and any tension with strategy.
@@ -94,6 +99,7 @@ rules:
     confidence: high
     tags: [adr, template, evidence]
     summary: The ADR is missing a required section or still contains TBD.
+    people_impact: "A half-finished decision record leaves future teammates guessing why something was chosen."
     guidance: An ADR must have the sections Guidance consulted, Deviations requiring approval and Tensions with strategy. "None" is a valid answer; "TBD" is not.
     remediation: Complete the missing sections. Write "None" where nothing applies.
     exemplars:

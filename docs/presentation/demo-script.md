@@ -40,8 +40,8 @@ Open [PR 3](https://github.com/Earlyflash/MCPGovenance-DemoApp/pull/3). It adds 
 1. **Set the scene.** Say: this is an ordinary pull request. The author did nothing special. Scroll to the bottom of the conversation tab.
 2. **Show the check.** Point at the failing check, governed / governor. Say: there is one check to require, however many areas we add.
 3. **Show the comment.** Point at the banner (Blocked), then the totals row (3 blocking), then the scoreboard. Say: each area reviews on its own; this comment only collates them. Here only security applied, because only a Python file changed.
-4. **Open one finding.** Pick the secret (SEC-001, admin.py line 5). Read the Found line: the value is redacted, so the comment never leaks the secret again. Read How to fix.
-5. **Follow the policy link.** Click Read the policy. Say: engineers read the plain-language policy; the Rule definition link is the exact rule for people who maintain it.
+4. **Open one finding.** Pick the secret (SEC-001, admin.py line 5). Read the **What we noticed** line: the value is redacted, so the comment never leaks the secret again. Then read **Why it matters**, which says in plain words who is affected, and **A way forward**. Point out the tone: the comment opens by thanking the author, and nothing in it blames them.
+5. **Follow the policy link.** Click **The policy, in plain words**. Say: engineers read the plain-language policy; **The exact rule** link is for people who maintain it.
 6. **Point at the owner.** Under the domain heading, show the owner and contact. Say: every finding says who to ask.
 7. **Mention the agent block.** Expand the machine-readable findings at the bottom. Say: this is how Copilot can fix its own pull request.
 
@@ -55,7 +55,7 @@ Open [PR 5](https://github.com/Earlyflash/MCPGovenance-DemoApp/pull/5). It adds 
 2. **Show the product stage line.** Point at Scan, Pilot, Production with Pilot in bold. Say: this product declared itself a pilot, so it is held to the pilot guardrails.
 3. **Read the two blocks.** The banned package, and the missing decision record for technology that is off the paved road. Say: the pipeline does not decide whether React is a good idea. It checks that a person recorded the decision.
 4. **Read a heads-up.** On a warning, show the line that says it becomes blocking at Production. Say: the author is told early, while it is cheap to fix.
-5. **Show the catalogue link.** Open the Rule definition for the banned technology. Say: agents ask the same catalogue through the MCP server, so Copilot can be told what is approved before it writes the code.
+5. **Show the catalogue link.** Open **The exact rule** for the banned technology. Say: agents ask the same catalogue through the MCP server, so Copilot can be told what is approved before it writes the code.
 
 Transition: the same repository, a different stage. Watch what happens when this product is promoted.
 
@@ -64,10 +64,10 @@ Transition: the same repository, a different stage. Watch what happens when this
 Open [PR 7](https://github.com/Earlyflash/MCPGovenance-DemoApp/pull/7). It changes one word in one file: stage: pilot becomes stage: production. This is the most important demo because it shows the idea of guardrails that grow. Time: about 3 minutes.
 
 1. **Show the diff first.** Open the Files changed tab. One line changed in .governance.yml. Say: the author touched no code.
-2. **Show the result anyway.** Back on the conversation tab, show the Blocked banner. Say: the pipeline checked the whole repository, not just the diff, because the stage went up. Point at the Stage promotion note and at the totals row, which says the whole repository was scanned.
+2. **Show the result anyway.** Back on the conversation tab, show the Blocked banner and the friendly opening line. Say: the pipeline checked the whole repository, not just the diff, because the stage went up. Point at the **You are moving up a stage** note and at the totals row, which says the whole repository was scanned.
 3. **Open the blocking finding.** It is the Dockerfile that runs as root (SEC-005). Read the line that says it was only a warning for a pilot but blocks for production. Say: at pilot this was a warning; now it is a block.
 4. **Show the warning.** One vague link on the home page, a guardrail that only starts at production. It is advice only because accessibility is an advice-only area.
-5. **Go back to PR 1 or PR 4 for contrast.** On PR 4 point at the section called Coming at a higher stage. Say: even at pilot, teams can see what is ahead. Nothing there counts yet.
+5. **Go back to PR 1 or PR 4 for contrast.** On PR 4 point at the section called **A look ahead: coming at a higher stage**. Say: even at pilot, teams can see what is ahead. Nothing there counts yet.
 6. **Make the point.** Promotion becomes a readiness check with a clear list of what is missing, instead of a surprise review.
 
 Transition: now show the picture that explains all of it.
@@ -98,7 +98,7 @@ Use these if the room wants more or you have time. Each is two to three minutes.
 **A preview of a later stage (PR 4)** ([PR 4](https://github.com/Earlyflash/MCPGovenance-DemoApp/pull/4))
 
 1. Show seven accessibility warnings. Say: accessibility is advice only, so even rules marked blocking appear as warnings.
-2. Point at the section called Coming at a higher stage.
+2. Point at the section called **A look ahead: coming at a higher stage**.
 
 **What people ask for (the demand layer)**
 

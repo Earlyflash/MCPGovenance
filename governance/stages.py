@@ -117,16 +117,16 @@ def detect_stage(repo: Path, base: str | None, policy: dict[str, Any], override:
     if floor is None:
         if head:
             stage, source = head, f"{head_where} (first declared in this pull request)"
-            notes.append("The stage is declared for the first time in this pull request. It needs code owner approval to merge.")
+            notes.append("The stage is declared for the first time in this pull request, so it needs a code owner's approval to merge. Thank you for setting it.")
         else:
             stage, source = default, f"not declared, so the default ({default}) applies"
     else:
         stage, source = floor[0], floor[1]
         if head and rank(head) > rank(stage):
             stage, source, promoted = head, f"{head_where} (raised in this pull request)", True
-            notes.append(f"This pull request raises the stage from {floor[0]} to {head}, so the whole product is re-checked against the guardrails it adds.")
+            notes.append(f"This pull request raises the stage from {floor[0]} to {head}, so we have checked the whole product against the extra guardrails it brings.")
         elif head and rank(head) < rank(stage):
-            notes.append(f"This pull request tries to lower the stage to {head}. A pull request cannot lower the stage, so {stage} still applies.")
+            notes.append(f"This pull request tries to lower the stage to {head}. A pull request can only raise the stage, never lower it, so {stage} still applies.")
     return {"stage": stage, "source": source, "promoted": promoted, "notes": notes}
 
 
