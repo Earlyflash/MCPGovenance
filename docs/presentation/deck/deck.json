@@ -7,35 +7,35 @@
   "lists": "css",
   "title": "PR governance: guardrails that grow with your product",
   "order": [
-    "cover",
-    "problem",
-    "how",
-    "layers",
-    "developer",
-    "stages",
-    "escalation",
-    "trust",
-    "policy-flow",
-    "demand",
-    "demo-map",
-    "next"
+    "01-cover",
+    "02-problem",
+    "03-how",
+    "04-layers",
+    "05-developer",
+    "06-stages",
+    "07-escalation",
+    "08-trust",
+    "09-policy-flow",
+    "10-demand",
+    "11-demo-map",
+    "12-next"
   ],
   "sections": {
     "s1": {
       "description": "Why we need it and how it works.",
-      "start": "cover"
+      "start": "01-cover"
     },
     "s2": {
       "description": "What developers and governance teams experience.",
-      "start": "developer"
+      "start": "05-developer"
     },
     "s3": {
       "description": "Stages, escalation and trust.",
-      "start": "stages"
+      "start": "06-stages"
     },
     "s4": {
       "description": "The demo and what we need from you.",
-      "start": "demo-map"
+      "start": "11-demo-map"
     }
   },
   "faces": {

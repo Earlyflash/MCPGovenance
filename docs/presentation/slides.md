@@ -1,6 +1,6 @@
 # Presentation: guardrails that grow with your product
 
-A text version of the slides, with speaker notes, for reading without the slide viewer. The slide source is in [`deck/`](deck/) (one HTML file per slide; `deck.json` holds the order). Use it with the [demo script](demo-script.md).
+A text version of the slides, with speaker notes, for reading without the slide viewer. The slide source is in [`deck/`](deck/) (one HTML file per slide, numbered in presentation order; `deck.json` holds the order). Use it with the [demo script](demo-script.md).
 
 The published deck is a private slides artifact; these files are the source it was built from.
 
