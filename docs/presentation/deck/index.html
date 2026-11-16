@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PR governance: guardrails that grow with your product</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400..700&family=Inter:wght@400;600&display=swap">
+<style>
+  :root { --bg:#0b1320; --fg:#e8edf3; --muted:#9aa7b6; --line:#243247; }
+  * { box-sizing: border-box; }
+  html, body { margin:0; height:100%; background:var(--bg); color:var(--fg); font-family:Inter, Arial, sans-serif; }
+  #wrap { position:fixed; inset:0 0 56px 0; display:flex; align-items:center; justify-content:center; overflow:hidden; }
+  #stage { width:1920px; height:1080px; flex:none; transform-origin:center center; background:#000; position:relative; box-shadow:0 8px 40px #0008; }
+  #stage > section { width:1920px !important; height:1080px !important; margin:0; overflow:hidden; box-sizing:border-box; }
+  #stage aside { display:none; }
+  #bar { position:fixed; left:0; right:0; bottom:0; height:56px; display:flex; align-items:center; gap:12px; padding:0 16px; border-top:1px solid var(--line); background:#0b1320; }
+  button { background:transparent; color:var(--fg); border:1px solid var(--line); border-radius:8px; padding:6px 12px; font:inherit; cursor:pointer; }
+  button:hover { border-color:var(--muted); }
+  #pos { color:var(--muted); min-width:64px; text-align:center; }
+  #title { color:var(--muted); flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  #notes { position:fixed; left:0; right:0; bottom:56px; max-height:38vh; overflow:auto; padding:14px 20px; background:#101c2c; border-top:1px solid var(--line); font-size:16px; line-height:1.5; display:none; }
+  body.notes #notes { display:block; }
+  body.notes #wrap { inset:0 0 calc(56px + 38vh) 0; }
+  #err { padding:24px; color:#f2b544; }
+</style>
+</head>
+<body>
+<div id="wrap"><div id="stage"></div></div>
+<div id="notes" aria-live="polite"></div>
+<div id="bar">
+  <button id="prev" aria-label="Previous slide">←</button>
+  <span id="pos">1 / 1</span>
+  <button id="next" aria-label="Next slide">→</button>
+  <span id="title"></span>
+  <button id="nbtn" aria-pressed="false">Speaker notes (N)</button>
+  <button id="fbtn">Full screen (F)</button>
+</div>
+<script>
+(async function () {
+  const stage = document.getElementById('stage'), notes = document.getElementById('notes');
+  const pos = document.getElementById('pos'), title = document.getElementById('title');
+  let order = [], slides = [], i = 0;
+  try {
+    const deck = await (await fetch('deck.json')).json();
+    order = deck.order; title.textContent = deck.title; document.title = deck.title;
+    slides = await Promise.all(order.map(async id => {
+      const html = await (await fetch('slides/' + id + '.html')).text();
+      const t = document.createElement('template'); t.innerHTML = html.trim();
+      const sec = t.content.querySelector('section');
+      const aside = sec.querySelector('aside');
+      const n = aside ? aside.textContent.trim() : '';
+      return { id, sec, notes: n };
+    }));
+  } catch (e) {
+    stage.outerHTML = '<div id="err">This viewer needs to be served over http (for example from GitHub Pages), not opened as a file. ' + e.message + '</div>';
+    return;
+  }
+  function fit() {
+    const w = document.getElementById('wrap');
+    const s = Math.min(w.clientWidth / 1920, w.clientHeight / 1080);
+    stage.style.transform = 'scale(' + s + ')';
+    stage.style.margin = (-(1080 - 1080 * s) / 2) + 'px ' + (-(1920 - 1920 * s) / 2) + 'px';
+  }
+  function show(n) {
+    i = Math.max(0, Math.min(slides.length - 1, n));
+    stage.replaceChildren(slides[i].sec.cloneNode(true));
+    notes.textContent = slides[i].notes || '(no speaker notes on this slide)';
+    pos.textContent = (i + 1) + ' / ' + slides.length;
+    history.replaceState(null, '', '#' + (i + 1));
+  }
+  function toggleNotes() { const on = document.body.classList.toggle('notes'); document.getElementById('nbtn').setAttribute('aria-pressed', on); fit(); }
+  document.getElementById('prev').onclick = () => show(i - 1);
+  document.getElementById('next').onclick = () => show(i + 1);
+  document.getElementById('nbtn').onclick = toggleNotes;
+  document.getElementById('fbtn').onclick = () => document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen();
+  addEventListener('keydown', e => {
+    if (['ArrowRight', 'PageDown', ' '].includes(e.key)) { e.preventDefault(); show(i + 1); }
+    else if (['ArrowLeft', 'PageUp'].includes(e.key)) { e.preventDefault(); show(i - 1); }
+    else if (e.key === 'Home') show(0); else if (e.key === 'End') show(slides.length - 1);
+    else if (e.key === 'n' || e.key === 'N') toggleNotes();
+    else if (e.key === 'f' || e.key === 'F') document.getElementById('fbtn').click();
+  });
+  addEventListener('resize', fit);
+  show((parseInt(location.hash.slice(1), 10) || 1) - 1);
+  fit();
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(fit);
+})();
+</script>
+</body>
+</html>
